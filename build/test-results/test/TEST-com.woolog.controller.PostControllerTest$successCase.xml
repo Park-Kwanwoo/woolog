@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="성공 케이스" tests="5" skipped="0" failures="0" errors="0" timestamp="2024-11-18T13:27:44" hostname="baggwan-uui-MacBookPro.local" time="0.233">
+  <properties/>
+  <testcase name="게시글 생성 성공" classname="com.woolog.controller.PostControllerTest$successCase" time="0.131"/>
+  <testcase name="게시글 단건 조회" classname="com.woolog.controller.PostControllerTest$successCase" time="0.008"/>
+  <testcase name="게시글 리스트 조회" classname="com.woolog.controller.PostControllerTest$successCase" time="0.066"/>
+  <testcase name="게시글 수정" classname="com.woolog.controller.PostControllerTest$successCase" time="0.018"/>
+  <testcase name="게시글 삭제" classname="com.woolog.controller.PostControllerTest$successCase" time="0.006"/>
+  <system-out><![CDATA[2024-11-18T22:27:44.972+09:00  INFO 4677 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.woolog.controller.PostControllerTest$successCase]: successCase does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-11-18T22:27:44.973+09:00  INFO 4677 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.woolog.WoologApplication for test class com.woolog.controller.PostControllerTest$successCase
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+
+MockHttpServletRequest:
+      HTTP Method = POST
+      Request URI = /posts
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"47"]
+             Body = {"title":"제목입니다.","content":"내용"}
+    Session Attrs = {}
+
+Handler:
+             Type = com.woolog.controller.PostController
+           Method = com.woolog.controller.PostController#write(PostCreate)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = []
+     Content type = null
+             Body = 
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+Hibernate: 
+    /* select
+        count(*) 
+    from
+        Post x */ select
+            count(*) 
+        from
+            post p1_0
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /posts/5
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8"]
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = com.woolog.controller.PostController
+           Method = com.woolog.controller.PostController#get(Long)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"id":5,"title":"제목입니다.","content":"내용"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    /* select
+        post 
+    from
+        Post post 
+    order by
+        post.id desc */ select
+            p1_0.id,
+            p1_0.content,
+            p1_0.title 
+        from
+            post p1_0 
+        order by
+            p1_0.id desc 
+        offset
+            ? rows 
+        fetch
+            first ? rows only
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /posts
+       Parameters = {page=[0], size=[10]}
+          Headers = [Content-Type:"application/json;charset=UTF-8"]
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = com.woolog.controller.PostController
+           Method = com.woolog.controller.PostController#getList(PagingRequest)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = [{"id":35,"title":"우로그 테스트 제목30","content":"우로그 테스트 내용30"},{"id":34,"title":"우로그 테스트 제목29","content":"우로그 테스트 내용29"},{"id":33,"title":"우로그 테스트 제목28","content":"우로그 테스트 내용28"},{"id":32,"title":"우로그 테스트 제목27","content":"우로그 테스트 내용27"},{"id":31,"title":"우로그 테스트 제목26","content":"우로그 테스트 내용26"},{"id":30,"title":"우로그 테스트 제목25","content":"우로그 테스트 내용25"},{"id":29,"title":"우로그 테스트 제목24","content":"우로그 테스트 내용24"},{"id":28,"title":"우로그 테스트 제목23","content":"우로그 테스트 내용23"},{"id":27,"title":"우로그 테스트 제목22","content":"우로그 테스트 내용22"},{"id":26,"title":"우로그 테스트 제목21","content":"우로그 테스트 내용21"}]
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+Hibernate: 
+    /* select
+        count(*) 
+    from
+        Post x */ select
+            count(*) 
+        from
+            post p1_0
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+Hibernate: 
+    /* update
+        for com.woolog.domain.Post */update post 
+    set
+        content=?,
+        title=? 
+    where
+        id=?
+
+MockHttpServletRequest:
+      HTTP Method = PATCH
+      Request URI = /posts/36
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"59"]
+             Body = {"title":"수정 후 제목","content":"수정 후 내용"}
+    Session Attrs = {}
+
+Handler:
+             Type = com.woolog.controller.PostController
+           Method = com.woolog.controller.PostController#edit(Long, PostEdit)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = []
+     Content type = null
+             Body = 
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+Hibernate: 
+    /* <criteria> */ select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    /* insert for
+        com.woolog.domain.Post */insert 
+    into
+        post (content, title, id) 
+    values
+        (?, ?, default)
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+Hibernate: 
+    /* delete for com.woolog.domain.Post */delete 
+    from
+        post 
+    where
+        id=?
+
+MockHttpServletRequest:
+      HTTP Method = DELETE
+      Request URI = /posts/37
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8"]
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = com.woolog.controller.PostController
+           Method = com.woolog.controller.PostController#delete(Long)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = []
+     Content type = null
+             Body = 
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.content,
+        p1_0.title 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
