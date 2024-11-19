@@ -1,11 +1,11 @@
 ## gradle
 .gradle
-build/
-
+**/build/
+!src/**/build/
 
 ## Java
 *.class
 
 ## IntelliJ
-.idea
+.idea/
 out/
