@@ -9,3 +9,9 @@
 ## IntelliJ
 .idea/
 out/
+
+## OS
+.DS_Store
+
+## woolog
+nodeenv-22
