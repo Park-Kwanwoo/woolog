@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -80,7 +80,7 @@ class PostControllerTest {
             // then
             assertEquals(1L, postRepository.count());
 
-            Post post = postRepository.findAll().get(0);
+            Post post = postRepository.findAll().getFirst();
             assertEquals("제목입니다.", post.getTitle());
             assertEquals("내용", post.getContent());
         }

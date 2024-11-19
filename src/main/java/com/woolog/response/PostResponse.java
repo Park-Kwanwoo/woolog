@@ -1,7 +1,6 @@
 package com.woolog.response;
 
 import com.woolog.domain.Post;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
