@@ -5,7 +5,6 @@ import com.woolog.domain.Post;
 import com.woolog.repository.PostRepository;
 import com.woolog.request.PostCreate;
 import com.woolog.request.PostEdit;
-import com.woolog.response.ResponseStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static com.woolog.response.ResponseStatus.BAD_REQUEST;
+import static com.woolog.response.ResponseStatus.NOT_FOUND;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -198,7 +199,7 @@ class PostControllerTest {
     class FailureCase {
 
         @Test
-        @DisplayName("제목이 존재하지 않을 때")
+        @DisplayName("게시글 저장 - Post field title is null")
         void TITLE_VALUE_VALIDATION() throws Exception {
 
             // given
@@ -214,16 +215,16 @@ class PostControllerTest {
                             .content(json)
                     )
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.status").value(ResponseStatus.BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(ResponseStatus.BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(ResponseStatus.BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
+                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
+                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
                     .andExpect(jsonPath("$.data[0].message").value(titleValidationMessage))
                     .andDo(print());
         }
 
         @Test
-        @DisplayName("내용이 존재하지 않을 때")
+        @DisplayName("게시글 저장 - Post field content is null")
         void CONTENT_VALUE_VALIDATION() throws Exception {
 
             // given
@@ -231,6 +232,7 @@ class PostControllerTest {
                     .title("제목입니다.")
                     .content(null)
                     .build();
+
             String json = objectMapper.writeValueAsString(request);
 
             // expected
@@ -239,9 +241,9 @@ class PostControllerTest {
                             .content(json)
                     )
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.status").value(ResponseStatus.BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(ResponseStatus.BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(ResponseStatus.BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
+                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
+                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
                     .andDo(print());
@@ -249,7 +251,7 @@ class PostControllerTest {
         }
 
         @Test
-        @DisplayName("제목과 내용이 존재하지 않을 때")
+        @DisplayName("게시글 저장 - Post all require field is null")
         void TITLE_AND_CONTENT_VALUE_VALIDATION() throws Exception {
 
             // given
@@ -257,6 +259,7 @@ class PostControllerTest {
                     .title(null)
                     .content(null)
                     .build();
+
             String json = objectMapper.writeValueAsString(request);
 
             // expected
@@ -265,9 +268,9 @@ class PostControllerTest {
                             .content(json)
                     )
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.status").value(ResponseStatus.BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(ResponseStatus.BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(ResponseStatus.BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
+                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
+                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
                     .andExpect(jsonPath("$.data[1].field").value("title"))
@@ -277,7 +280,7 @@ class PostControllerTest {
 
         @Test
         @DisplayName("게시글 단건 조회 실패")
-        void FALIED_GET_POST_ONE() throws Exception {
+        void FAILED_GET_POST_ONE() throws Exception {
 
             // given
             Post post = Post.builder()
@@ -291,9 +294,9 @@ class PostControllerTest {
             mockMvc.perform(get("/posts/{postId}", savedPost.getId() + 1L)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.status").value(404))
-                    .andExpect(jsonPath("$.code").value("NOT_FOUND"))
-                    .andExpect(jsonPath("$.description").value("잘못된 요청입니다."))
+                    .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
+                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.description").value(NOT_FOUND.getDescription()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
                     .andDo(print());
@@ -301,8 +304,8 @@ class PostControllerTest {
         }
 
         @Test
-        @DisplayName("게시글 수정 실패")
-        void FALIED_EDIT_POST_ONE() throws Exception {
+        @DisplayName("게시글 수정 실패 - 존재하지 않는 Post")
+        void FAILED_EDIT_POST_NOT_EXIST() throws Exception {
 
             // given
             Post post = Post.builder()
@@ -324,9 +327,9 @@ class PostControllerTest {
                             .contentType(APPLICATION_JSON)
                             .content(editJson))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.status").value(404))
-                    .andExpect(jsonPath("$.code").value("NOT_FOUND"))
-                    .andExpect(jsonPath("$.description").value("잘못된 요청입니다."))
+                    .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
+                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.description").value(NOT_FOUND.getDescription()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
                     .andDo(print());
@@ -334,7 +337,104 @@ class PostControllerTest {
         }
 
         @Test
-        @DisplayName("게시글 삭제 실패")
+        @DisplayName("게시글 수정 실패 - PostEdit title field is null")
+        void FAILED_EDIT_POST_EDIT_TITLE_IS_NULL() throws Exception {
+
+            // given
+            Post post = Post.builder()
+                    .title("제목입니다.")
+                    .content("내용")
+                    .build();
+
+            Post savedPost = postRepository.save(post);
+
+            PostEdit postEdit = PostEdit.builder()
+                    .content("수정 후 내용")
+                    .build();
+
+            String editJson = objectMapper.writeValueAsString(postEdit);
+
+            // expected
+            mockMvc.perform(patch("/posts/{postId}", savedPost.getId())
+                            .contentType(APPLICATION_JSON)
+                            .content(editJson))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
+                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
+                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.data[0].field").value("title"))
+                    .andExpect(jsonPath("$.data[0].message").value(titleValidationMessage))
+                    .andDo(print());
+
+        }
+
+        @Test
+        @DisplayName("게시글 수정 실패 - PostEdit content value is null")
+        void FAILED_EDIT_POST_EDIT_CONTENT_IS_NULL() throws Exception {
+
+            // given
+            Post post = Post.builder()
+                    .title("제목입니다.")
+                    .content("내용")
+                    .build();
+
+            Post savedPost = postRepository.save(post);
+
+            PostEdit postEdit = PostEdit.builder()
+                    .title("수정 후 제목")
+                    .build();
+
+            String editJson = objectMapper.writeValueAsString(postEdit);
+
+            // expected
+            mockMvc.perform(patch("/posts/{postId}", savedPost.getId())
+                            .contentType(APPLICATION_JSON)
+                            .content(editJson))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
+                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
+                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.data[0].field").value("content"))
+                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
+                    .andDo(print());
+
+        }
+
+        @Test
+        @DisplayName("게시글 수정 실패 - PostEdit all require field is null")
+        void FAILED_EDIT_POST_ALL_FILED_IS_NULL() throws Exception {
+
+            // given
+            Post post = Post.builder()
+                    .title("제목입니다.")
+                    .content("내용")
+                    .build();
+
+            Post savedPost = postRepository.save(post);
+
+            PostEdit postEdit = PostEdit.builder()
+                    .build();
+
+            String editJson = objectMapper.writeValueAsString(postEdit);
+
+            // expected
+            mockMvc.perform(patch("/posts/{postId}", savedPost.getId())
+                            .contentType(APPLICATION_JSON)
+                            .content(editJson))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
+                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
+                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.data[0].field").value("content"))
+                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
+                    .andExpect(jsonPath("$.data[1].field").value("title"))
+                    .andExpect(jsonPath("$.data[1].message").value(titleValidationMessage))
+                    .andDo(print());
+
+        }
+
+        @Test
+        @DisplayName("게시글 삭제 실패 - 존재하지 않는 Post")
         void FALIED_DELETE_POST_ONE() throws Exception {
 
             // given
@@ -349,9 +449,9 @@ class PostControllerTest {
             mockMvc.perform(delete("/posts/{postId}", savedPost.getId() + 1L)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.status").value(404))
-                    .andExpect(jsonPath("$.code").value("NOT_FOUND"))
-                    .andExpect(jsonPath("$.description").value("잘못된 요청입니다."))
+                    .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
+                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.description").value(NOT_FOUND.getDescription()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
                     .andDo(print());

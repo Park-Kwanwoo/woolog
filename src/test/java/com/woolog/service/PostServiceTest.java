@@ -1,6 +1,7 @@
 package com.woolog.service;
 
 import com.woolog.domain.Post;
+import com.woolog.exception.PostNotFound;
 import com.woolog.repository.PostRepository;
 import com.woolog.request.PagingRequest;
 import com.woolog.request.PostCreate;
@@ -141,7 +142,7 @@ class PostServiceTest {
 
             when(postRepository.findById(fakeId))
                     .thenReturn(Optional.of(savedPost))
-                    .thenThrow(IllegalArgumentException.class);
+                    .thenThrow(PostNotFound.class);
 
             // when
             postService.delete(fakeId);
@@ -149,7 +150,7 @@ class PostServiceTest {
             // then
             verify(postRepository, times(1)).delete(any(Post.class));
 
-            assertThrows(IllegalArgumentException.class, () -> postRepository.findById(fakeId));
+            assertThrows(PostNotFound.class, () -> postRepository.findById(fakeId));
         }
     }
 
@@ -158,17 +159,52 @@ class PostServiceTest {
     class FailureCase {
 
         @Test
-        @DisplayName("게시글 조회 실패")
-        void FAILED_GET_POST() throws Exception {
+        @DisplayName("게시글 조회 실패 - 존재하지 않는 Post")
+        void FAILED_GET_POST() {
 
             // given
-
-
+            when(postRepository.findById(anyLong())).thenThrow(new PostNotFound("postId", "존재하지 않는 글입니다."));
 
             // when
-
-
             // then
+            PostNotFound e = assertThrows(PostNotFound.class, () -> postService.get(anyLong()));
+            assertEquals("존재하지 않는 글입니다.", e.getMessage());
+            assertEquals("postId", e.getField());
+
+        }
+
+        @Test
+        @DisplayName("게시글 수정 실패 - 존재하지 않는 Post")
+        void FAILED_EDIT_POST_NOT_EXIST() {
+
+            // given
+            when(postRepository.findById(anyLong())).thenThrow(new PostNotFound("postId", "존재하지 않는 글입니다."));
+
+            PostEdit edit = PostEdit.builder().build();
+
+            // when
+            // then
+            PostNotFound e = assertThrows(PostNotFound.class, () -> postService.edit(anyLong(), edit));
+
+            assertEquals("존재하지 않는 글입니다.", e.getMessage());
+            assertEquals("postId", e.getField());
+
+        }
+
+        @Test
+        @DisplayName("게시글 삭제 실패 - 존재하지 않는 Post")
+        void FAILED_DELETE_POST() {
+
+            // given
+            when(postRepository.findById(anyLong())).thenThrow(new PostNotFound("postId", "존재하지 않는 글입니다."));
+
+            // when
+            // then
+            PostNotFound e = assertThrows(PostNotFound.class, () -> postService.delete(anyLong()));
+            verify(postRepository, times(1)).findById(anyLong());
+            assertEquals("존재하지 않는 글입니다.", e.getMessage());
+            assertEquals("postId", e.getField());
+
         }
     }
 }

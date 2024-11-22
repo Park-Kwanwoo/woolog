@@ -31,7 +31,6 @@ public class PostController {
 
     @GetMapping("/posts")
     public List<PostResponse> getList(@ModelAttribute @Valid PagingRequest pagingRequest) {
-
         return postService.getPagingList(pagingRequest);
     }
 
