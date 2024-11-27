@@ -22,7 +22,7 @@ public class WoologExceptionController {
         CommonResponse<CommonResponseField> commonResponse = new CommonResponse<>(BAD_REQUEST);
         List<FieldError> fieldErrors = e.getFieldErrors();
 
-        for (FieldError fieldError : fieldErrors) {
+        for (FieldError fieldError  : fieldErrors) {
             commonResponse.addData(new CommonResponseField(fieldError.getField(), fieldError.getDefaultMessage()));
         }
 
