@@ -15,3 +15,6 @@ out/
 
 ## woolog
 nodeenv-22
+
+## http request
+*.http

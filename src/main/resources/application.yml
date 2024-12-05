@@ -29,3 +29,8 @@ spring:
     web:
       pageable:
         page-parameter: true
+
+jwt:
+  secret-key: dGhpcyBpcyBteSBwZXJzb25hbCBwcm9qZWN0IHNlY3JldGtleQ==
+  expiration-time: 86400000
+  issuer: woolog
