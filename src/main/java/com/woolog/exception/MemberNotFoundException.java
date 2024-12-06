@@ -6,12 +6,12 @@ import com.woolog.response.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class UserNotFoundException extends WoologException {
+public class MemberNotFoundException extends WoologException {
 
     private final String field;
     private final String message;
 
-    public UserNotFoundException(String field, String message) {
+    public MemberNotFoundException(String field, String message) {
         super();
         this.field = field;
         this.message = message;
