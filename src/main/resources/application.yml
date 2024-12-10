@@ -32,5 +32,6 @@ spring:
 
 jwt:
   secret-key: dGhpcyBpcyBteSBwZXJzb25hbCBwcm9qZWN0IHNlY3JldGtleQ==
-  expiration-time: 86400000
+  access-expiration-time: 3600
+  refresh-expiration-time: 86400
   issuer: woolog

@@ -1,11 +1,10 @@
 package com.woolog.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woolog.exception.UserNotFoundException;
+import com.woolog.exception.LoginArgumentValidation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,9 +43,9 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
             Login login = objectMapper.readValue(request.getInputStream(), Login.class);
 
             if (login.getEmail().isEmpty()) {
-                throw new UserNotFoundException("email", "아이디를 입력해주세요");
+                throw new LoginArgumentValidation("email", "아이디를 입력해주세요");
             } else if (login.getPassword().isEmpty()) {
-                throw new UserNotFoundException("password", "비밀번호를 입력해주세요.");
+                throw new LoginArgumentValidation("password", "비밀번호를 입력해주세요.");
             }
 
             UsernamePasswordAuthenticationToken unauthenticatedLoginInfo = UsernamePasswordAuthenticationToken.unauthenticated(login.getEmail(), login.getPassword());

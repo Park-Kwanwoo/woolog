@@ -14,10 +14,12 @@ public class MemberAuthenticationException extends SecurityException {
         this.message = message;
     }
 
+    @Override
     public ResponseStatus getHttpStatus() {
-        return ResponseStatus.NOT_FOUND;
+        return ResponseStatus.MEMBER_AUTHENTICATION_EXCEPTION;
     }
 
+    @Override
     public CommonResponseField getErrorResponse() {
         return CommonResponseField.builder()
                 .field(this.field)

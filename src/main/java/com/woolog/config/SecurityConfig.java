@@ -2,11 +2,13 @@ package com.woolog.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.filter.CustomAuthenticationFilter;
+import com.woolog.handler.CustomEntryPoint;
 import com.woolog.handler.CustomLoginFailureHandler;
 import com.woolog.handler.CustomLoginSuccessHandler;
 import com.woolog.repository.MemberRepository;
 import com.woolog.security.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,10 +21,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toStaticResources;
@@ -34,6 +38,8 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final MemberRepository memberRepository;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+    private final JwtTokenGenerator jwtTokenGenerator;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -47,7 +53,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/posts").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/posts").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/posts").authenticated()
-                        .anyRequest().permitAll());
+                        .requestMatchers("/entry").hasRole("ADMIN")
+                        .anyRequest().permitAll())
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
+        ;
 
         return http.build();
     }
@@ -73,24 +82,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtTokenGenerator jwtTokenGenerator() {
-        return new JwtTokenGenerator();
-    }
-
-    @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomLoginSuccessHandler(jwtTokenGenerator());
+        return new CustomLoginSuccessHandler(jwtTokenGenerator, objectMapper);
     }
 
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
-        return new CustomLoginFailureHandler();
+        return new CustomLoginFailureHandler(handlerExceptionResolver);
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(authenticationProvider());
+    }
 
     @Bean
-    public AuthenticationManager authenticationManager()  {
-        return new ProviderManager(authenticationProvider());
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomEntryPoint();
     }
 
     @Bean
