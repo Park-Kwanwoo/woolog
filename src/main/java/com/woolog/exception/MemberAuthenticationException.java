@@ -2,8 +2,9 @@ package com.woolog.exception;
 
 import com.woolog.response.CommonResponseField;
 import com.woolog.response.ResponseStatus;
+import org.springframework.security.core.AuthenticationException;
 
-public class MemberAuthenticationException extends SecurityException {
+public class MemberAuthenticationException extends AuthenticationException implements CustomException {
 
     private final String field;
     private final String message;
