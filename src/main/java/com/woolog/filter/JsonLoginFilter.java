@@ -5,6 +5,7 @@ import com.woolog.exception.LoginArgumentValidation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,15 +14,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
 @Slf4j
 @Setter
-public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class JsonLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
 
@@ -29,8 +28,8 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
     private static final AntPathRequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher("/auth/login", "POST");
 
-    public CustomAuthenticationFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager) {
-        super(LOGIN_REQUEST_MATCHER, authenticationManager);
+    public JsonLoginFilter(ObjectMapper objectMapper) {
+        super(LOGIN_REQUEST_MATCHER);
         this.objectMapper = objectMapper;
     }
 
@@ -49,18 +48,10 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
             }
 
             UsernamePasswordAuthenticationToken unauthenticatedLoginInfo = UsernamePasswordAuthenticationToken.unauthenticated(login.getEmail(), login.getPassword());
+
+            unauthenticatedLoginInfo.setDetails(this.authenticationDetailsSource.buildDetails(request));
             return this.getAuthenticationManager().authenticate(unauthenticatedLoginInfo);
         }
-    }
-
-    @Override
-    public void setAuthenticationSuccessHandler(AuthenticationSuccessHandler successHandler) {
-        super.setAuthenticationSuccessHandler(successHandler);
-    }
-
-    @Override
-    public void setAuthenticationFailureHandler(AuthenticationFailureHandler failureHandler) {
-        super.setAuthenticationFailureHandler(failureHandler);
     }
 
     @Data
