@@ -13,8 +13,4 @@ public abstract class WoologException extends RuntimeException {
         super(message);
     }
 
-    public abstract ResponseStatus getHttpStatus();
-
-    public abstract CommonResponseField getErrorResponse();
-
 }

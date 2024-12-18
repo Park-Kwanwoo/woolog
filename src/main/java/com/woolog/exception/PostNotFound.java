@@ -8,7 +8,7 @@ import lombok.Getter;
  * status: 404
  */
 @Getter
-public class PostNotFound extends WoologException {
+public class PostNotFound extends WoologException implements CustomException {
 
     private final String field;
     private final String message;

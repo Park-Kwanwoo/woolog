@@ -2,14 +2,13 @@ package com.woolog.exception;
 
 import com.woolog.response.CommonResponseField;
 import com.woolog.response.ResponseStatus;
-import org.springframework.security.core.AuthenticationException;
 
-public class LoginArgumentValidation extends AuthenticationException implements CustomException {
+public class InvalidTokenException extends WoologException implements CustomException {
 
     private final String field;
     private final String message;
 
-    public LoginArgumentValidation(String field, String message) {
+    public InvalidTokenException(String field, String message) {
         super(message);
         this.field = field;
         this.message = message;
@@ -17,7 +16,7 @@ public class LoginArgumentValidation extends AuthenticationException implements 
 
     @Override
     public ResponseStatus getHttpStatus() {
-        return ResponseStatus.BAD_REQUEST;
+        return null;
     }
 
     @Override
