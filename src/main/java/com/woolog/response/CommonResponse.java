@@ -12,13 +12,13 @@ public class CommonResponse<T> {
 
     private int status;
     private String code;
-    private String description;
+    private String message;
     private final List<T> data = new ArrayList<>();
 
     public CommonResponse(ResponseStatus responseStatus) {
         this.status = responseStatus.getStatus();
         this.code = responseStatus.getCode();
-        this.description = responseStatus.getDescription();
+        this.message = responseStatus.getMessage();
     }
 
     public void addData(T e) {
