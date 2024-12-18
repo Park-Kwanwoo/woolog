@@ -1,4 +1,4 @@
-package com.woolog.filter;
+package com.woolog.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.exception.LoginArgumentValidation;

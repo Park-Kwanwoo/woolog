@@ -1,57 +1,56 @@
-package com.woolog.handler;
+package com.woolog.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.config.JwtTokenGenerator;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Date;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+@Slf4j
 public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final JwtTokenGenerator jwtTokenGenerator;
-    private final ObjectMapper objectMapper;
 
-    public CustomLoginSuccessHandler(JwtTokenGenerator jwtTokenGenerator, ObjectMapper objectMapper) {
+    public CustomLoginSuccessHandler(JwtTokenGenerator jwtTokenGenerator) {
         this.jwtTokenGenerator = jwtTokenGenerator;
-        this.objectMapper = objectMapper;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
 
         String email = (String) authentication.getPrincipal();
-        String accessToken = jwtTokenGenerator.generateAccessToken(email);
-        String refreshToken = jwtTokenGenerator.generateRefreshToken(email);
+        setResponse(email, response);
 
-        response.setHeader("Authorization", accessToken);
-        response.setCharacterEncoding("utf-8");
-        response.setHeader("Set-Cookie", setCookie(refreshToken));
-
-        setDefaultTargetUrl("/posts");
+        setDefaultTargetUrl("/");
         super.onAuthenticationSuccess(request, response, authentication);
-
-        // TODO
-        //  2. Authorized Filter and Verify Jwt Token (entry) and User role set, Test Code -> TuesDay
-        //  3. Comment, Vue // Friday
-        //  4. After Basic study and resume
 
     }
 
-    protected String setCookie(String refreshToken) {
+    protected void setResponse(String email, HttpServletResponse response) {
 
-        return ResponseCookie.from("refreshToken", refreshToken)
+        String accessToken = jwtTokenGenerator.generateAccessToken(email);
+        String refreshToken = jwtTokenGenerator.generateRefreshToken(email);
+
+        String cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .maxAge(Duration.ofDays(1))
                 .sameSite("Strict")
                 .build()
                 .toString();
+
+        response.setHeader("Authorization", accessToken);
+        response.setCharacterEncoding(UTF_8.name());
+        response.setHeader("Set-Cookie", cookie);
+
+        log.info("access = {}", accessToken);
+        log.info("refresh = {}", refreshToken);
     }
 }

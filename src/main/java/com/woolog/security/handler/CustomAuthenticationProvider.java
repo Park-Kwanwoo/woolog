@@ -1,4 +1,4 @@
-package com.woolog.security;
+package com.woolog.security.handler;
 
 import com.woolog.domain.Member;
 import com.woolog.exception.MemberAuthenticationException;
@@ -9,9 +9,10 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
+import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,12 +29,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String email = member.getEmail();
         String encodedPassword = member.getPassword();
         String rawPassword = (String) authentication.getCredentials();
+        String role = member.getRole().name();
+
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role);
 
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new MemberAuthenticationException("MEMBER", "아이디나 비밀번호가 잘못되었습니다.");
         }
 
-        return new UsernamePasswordAuthenticationToken(email, encodedPassword, List.of());
+        return new UsernamePasswordAuthenticationToken(email, encodedPassword, Collections.singletonList(simpleGrantedAuthority));
     }
 
     public boolean supports(Class<?> authentication) {
