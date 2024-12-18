@@ -1,17 +1,17 @@
 package com.woolog.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woolog.filter.CustomAuthenticationFilter;
-import com.woolog.handler.CustomEntryPoint;
-import com.woolog.handler.CustomLoginFailureHandler;
-import com.woolog.handler.CustomLoginSuccessHandler;
+import com.woolog.security.filter.JsonLoginFilter;
+import com.woolog.security.filter.JwtAuthenticationFilter;
+import com.woolog.security.handler.CustomAccessDeniedHandler;
+import com.woolog.security.handler.CustomEntryPoint;
+import com.woolog.security.handler.CustomLoginFailureHandler;
+import com.woolog.security.handler.CustomLoginSuccessHandler;
 import com.woolog.repository.MemberRepository;
-import com.woolog.security.CustomAuthenticationProvider;
+import com.woolog.security.handler.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -23,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -49,13 +50,13 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(tokenVerifyFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/posts").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/posts").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/posts").authenticated()
-                        .requestMatchers("/entry").hasRole("ADMIN")
+                        .requestMatchers("/admin").hasAuthority("ADMIN")
+                        .requestMatchers("/member").hasAuthority("MEMBER")
                         .anyRequest().permitAll())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
+                .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler()))
         ;
 
         return http.build();
@@ -67,13 +68,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomAuthenticationFilter jwtLoginFilter() {
+    public JsonLoginFilter jwtLoginFilter() {
 
-        CustomAuthenticationFilter jwtAuthenticationFilter = new CustomAuthenticationFilter(objectMapper, authenticationManager());
-        jwtAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
-        jwtAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
+        JsonLoginFilter loginFilter = new JsonLoginFilter(objectMapper);
+        loginFilter.setAuthenticationManager(authenticationManager());
+        loginFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+        loginFilter.setAuthenticationFailureHandler(authenticationFailureHandler());
 
-        return jwtAuthenticationFilter;
+        return loginFilter;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter tokenVerifyFilter() {
+        return new JwtAuthenticationFilter(jwtTokenGenerator, memberRepository);
     }
 
     @Bean
@@ -82,8 +89,13 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(authenticationProvider());
+    }
+
+    @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomLoginSuccessHandler(jwtTokenGenerator, objectMapper);
+        return new CustomLoginSuccessHandler(jwtTokenGenerator);
     }
 
     @Bean
@@ -92,13 +104,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager() {
-        return new ProviderManager(authenticationProvider());
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomEntryPoint(handlerExceptionResolver);
     }
 
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new CustomEntryPoint();
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler(handlerExceptionResolver);
     }
 
     @Bean
