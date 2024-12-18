@@ -17,4 +17,4 @@ out/
 nodeenv-22
 
 ## http request
-*.http
+src/main/resources/http/
