@@ -1,8 +1,9 @@
 package com.woolog.config;
 
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import com.woolog.exception.JwtValidException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -31,27 +32,20 @@ public class JwtTokenGenerator {
     private String issuer;
 
 
-    private SecretKey getSecretKey() {
-        byte[] decodeKey = Base64.getDecoder().decode(secretKey);
+    public SecretKey getSecretKey() {
+        byte[] decodeKey = Base64.getDecoder().decode(this.secretKey);
         return Keys.hmacShaKeyFor(decodeKey);
     }
 
     public String generateAccessToken(String email) {
-
-        return Jwts.builder()
-                .header()
-                    .add("typ", "JWT")
-                .and()
-                .subject(email)
-                .issuer(this.issuer)
-                .issuedAt(new Date())
-                .expiration(getAccessExpirationTime())
-                .signWith(getSecretKey())
-                .compact();
+        return generateToken(email, this.getAccessExpirationTime());
     }
 
     public String generateRefreshToken(String email) {
+        return generateToken(email, this.getRefreshExpirationTime());
+    }
 
+    public String generateToken(String email, Date expiration) {
         return Jwts.builder()
                 .header()
                 .add("typ", "JWT")
@@ -59,28 +53,34 @@ public class JwtTokenGenerator {
                 .subject(email)
                 .issuer(this.issuer)
                 .issuedAt(new Date())
-                .expiration(getRefreshExpirationTime())
-                .signWith(getSecretKey())
+                .expiration(expiration)
+                .signWith(this.getSecretKey())
                 .compact();
     }
 
-    protected Date getAccessExpirationTime() {
+    public Date getAccessExpirationTime() {
         return Date.from(Instant.now().plus(this.accessExpirationTime, ChronoUnit.SECONDS));
     }
 
-    protected Date getRefreshExpirationTime() {
+    public Date getRefreshExpirationTime() {
         return Date.from(Instant.now().plus(this.refreshExpirationTime, ChronoUnit.SECONDS));
     }
 
-    public boolean verifyAccessToken(String accessToken) {
-        SecretKey secretKey = getSecretKey();
-        JwtParser parser = Jwts.parser().verifyWith(secretKey).build();
-        return parser.isSigned(accessToken);
+    public boolean validateToken(String token) {
+
+        try {
+            Claims claims = getPayload(token);
+            return !claims.getExpiration().before(new Date());
+        } catch (JwtException e) {
+            throw new JwtValidException();
+        }
     }
 
-    public boolean verifyRefreshToken(String refreshToken) {
-        SecretKey secretKey = getSecretKey();
-        JwtParser parser = Jwts.parser().verifyWith(secretKey).build();
-        return parser.isSigned(refreshToken);
+    public Claims getPayload(String token) {
+        return Jwts.parser()
+                .verifyWith(this.getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
