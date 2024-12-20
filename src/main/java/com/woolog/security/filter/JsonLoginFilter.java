@@ -2,6 +2,7 @@ package com.woolog.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.exception.LoginArgumentValidation;
+import com.woolog.request.Login;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
@@ -52,12 +53,5 @@ public class JsonLoginFilter extends AbstractAuthenticationProcessingFilter {
             unauthenticatedLoginInfo.setDetails(this.authenticationDetailsSource.buildDetails(request));
             return this.getAuthenticationManager().authenticate(unauthenticatedLoginInfo);
         }
-    }
-
-    @Data
-    private static class Login {
-
-        private String email;
-        private String password;
     }
 }
