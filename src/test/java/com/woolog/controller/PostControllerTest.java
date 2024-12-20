@@ -1,19 +1,23 @@
 package com.woolog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woolog.annotation.CustomWithMockUser;
+import com.woolog.config.JwtTokenGenerator;
 import com.woolog.domain.Post;
 import com.woolog.repository.PostRepository;
 import com.woolog.request.PostCreate;
 import com.woolog.request.PostEdit;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -32,7 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@PropertySource("classpath:validation.properties")
+@PropertySource("classpath:messages/validation.properties")
+@ActiveProfiles("test")
 class PostControllerTest {
 
     @Autowired
@@ -42,16 +47,17 @@ class PostControllerTest {
     private PostRepository postRepository;
 
     @Autowired
+    private JwtTokenGenerator jwtTokenGenerator;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${NotBlank.title}")
-    private String titleValidationMessage;
+    private static final String TITLE_VALIDATION_MESSAGE = "제목을 입력해주세요.";
 
-    @Value("${NotBlank.content}")
-    private String contentValidationMessage;
+    private static final String contentValidationMessagCONTENT_VALIDATION_MESSAGE = "내용을 입력해주세요.";
 
     @BeforeEach
-    void clean() {
+    void setUp() {
         postRepository.deleteAll();
     }
 
@@ -60,6 +66,7 @@ class PostControllerTest {
     class successCase {
 
         @Test
+        @CustomWithMockUser
         @DisplayName("게시글 생성 성공")
         void SUCCESS_POST_REQUEST() throws Exception {
 
@@ -70,10 +77,18 @@ class PostControllerTest {
                     .build();
             String json = objectMapper.writeValueAsString(request);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             // expected
             mockMvc.perform(post("/posts")
                             .contentType(APPLICATION_JSON)
                             .content(json)
+                            .headers(headers)
+                            .cookie(cookie)
                     )
                     .andExpect(status().isOk())
                     .andDo(print());
@@ -151,6 +166,12 @@ class PostControllerTest {
 
             postRepository.save(post);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             PostEdit postEdit = PostEdit.builder()
                     .title("수정 후 제목")
                     .content("수정 후 내용")
@@ -161,7 +182,9 @@ class PostControllerTest {
             // expected
             mockMvc.perform(patch("/posts/{postId}", post.getId())
                             .contentType(APPLICATION_JSON)
-                            .content(editJson))
+                            .content(editJson)
+                            .headers(headers)
+                            .cookie(cookie))
                     .andExpect(status().isOk())
                     .andDo(print());
 
@@ -183,9 +206,17 @@ class PostControllerTest {
 
             postRepository.save(post);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             // expected
             mockMvc.perform(delete("/posts/{postId}", post.getId())
-                            .contentType(APPLICATION_JSON))
+                            .contentType(APPLICATION_JSON)
+                            .headers(headers)
+                            .cookie(cookie))
                     .andExpect(status().isOk())
                     .andDo(print());
 
@@ -199,7 +230,7 @@ class PostControllerTest {
     class FailureCase {
 
         @Test
-        @DisplayName("게시글 저장 - Post field title is null")
+        @DisplayName("게시글 저장 실패 - title is null")
         void TITLE_VALUE_VALIDATION() throws Exception {
 
             // given
@@ -207,24 +238,31 @@ class PostControllerTest {
                     .title(null)
                     .content("내용")
                     .build();
+
             String json = objectMapper.writeValueAsString(request);
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
 
             // expected
             mockMvc.perform(post("/posts")
                             .contentType(APPLICATION_JSON)
                             .content(json)
+                            .headers(headers)
+                            .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
                     .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
-                    .andExpect(jsonPath("$.data[0].message").value(titleValidationMessage))
+                    .andExpect(jsonPath("$.data[0].message").value(TITLE_VALIDATION_MESSAGE))
                     .andDo(print());
         }
 
         @Test
-        @DisplayName("게시글 저장 - Post field content is null")
+        @DisplayName("게시글 저장 실패 - content null")
         void CONTENT_VALUE_VALIDATION() throws Exception {
 
             // given
@@ -234,24 +272,30 @@ class PostControllerTest {
                     .build();
 
             String json = objectMapper.writeValueAsString(request);
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
 
             // expected
             mockMvc.perform(post("/posts")
                             .contentType(APPLICATION_JSON)
                             .content(json)
+                            .headers(headers)
+                            .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
                     .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
-                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
+                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
                     .andDo(print());
 
         }
 
         @Test
-        @DisplayName("게시글 저장 - Post all require field is null")
+        @DisplayName("게시글 저장 실패 - all field null")
         void TITLE_AND_CONTENT_VALUE_VALIDATION() throws Exception {
 
             // given
@@ -261,20 +305,26 @@ class PostControllerTest {
                     .build();
 
             String json = objectMapper.writeValueAsString(request);
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
 
             // expected
             mockMvc.perform(post("/posts")
                             .contentType(APPLICATION_JSON)
                             .content(json)
+                            .headers(headers)
+                            .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
                     .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
-                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
+                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
                     .andExpect(jsonPath("$.data[1].field").value("title"))
-                    .andExpect(jsonPath("$.data[1].message").value(titleValidationMessage))
+                    .andExpect(jsonPath("$.data[1].message").value(TITLE_VALIDATION_MESSAGE))
                     .andDo(print());
         }
 
@@ -293,10 +343,9 @@ class PostControllerTest {
             // expected
             mockMvc.perform(get("/posts/{postId}", savedPost.getId() + 1L)
                             .contentType(APPLICATION_JSON))
-                    .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
                     .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.description").value(NOT_FOUND.getDescription()))
+                    .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
                     .andDo(print());
@@ -315,6 +364,12 @@ class PostControllerTest {
 
             Post savedPost = postRepository.save(post);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             PostEdit postEdit = PostEdit.builder()
                     .title("수정 후 제목")
                     .content("수정 후 내용")
@@ -325,11 +380,12 @@ class PostControllerTest {
             // expected
             mockMvc.perform(patch("/posts/{postId}", savedPost.getId() + 1L)
                             .contentType(APPLICATION_JSON)
-                            .content(editJson))
-                    .andExpect(status().isNotFound())
+                            .content(editJson)
+                            .headers(headers)
+                            .cookie(cookie))
                     .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
                     .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.description").value(NOT_FOUND.getDescription()))
+                    .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
                     .andDo(print());
@@ -337,7 +393,7 @@ class PostControllerTest {
         }
 
         @Test
-        @DisplayName("게시글 수정 실패 - PostEdit title field is null")
+        @DisplayName("게시글 수정 실패 - title is null")
         void FAILED_EDIT_POST_EDIT_TITLE_IS_NULL() throws Exception {
 
             // given
@@ -354,22 +410,29 @@ class PostControllerTest {
 
             String editJson = objectMapper.writeValueAsString(postEdit);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             // expected
             mockMvc.perform(patch("/posts/{postId}", savedPost.getId())
                             .contentType(APPLICATION_JSON)
-                            .content(editJson))
-                    .andExpect(status().isBadRequest())
+                            .content(editJson)
+                            .headers(headers)
+                            .cookie(cookie))
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
                     .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
-                    .andExpect(jsonPath("$.data[0].message").value(titleValidationMessage))
+                    .andExpect(jsonPath("$.data[0].message").value(TITLE_VALIDATION_MESSAGE))
                     .andDo(print());
 
         }
 
         @Test
-        @DisplayName("게시글 수정 실패 - PostEdit content value is null")
+        @DisplayName("게시글 수정 실패 - content is null")
         void FAILED_EDIT_POST_EDIT_CONTENT_IS_NULL() throws Exception {
 
             // given
@@ -385,23 +448,30 @@ class PostControllerTest {
                     .build();
 
             String editJson = objectMapper.writeValueAsString(postEdit);
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
 
             // expected
             mockMvc.perform(patch("/posts/{postId}", savedPost.getId())
                             .contentType(APPLICATION_JSON)
-                            .content(editJson))
-                    .andExpect(status().isBadRequest())
+                            .content(editJson)
+                            .headers(headers)
+                            .cookie(cookie)
+                    )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
                     .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
-                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
+                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
                     .andDo(print());
 
         }
 
         @Test
-        @DisplayName("게시글 수정 실패 - PostEdit all require field is null")
+        @DisplayName("게시글 수정 실패 - all field null")
         void FAILED_EDIT_POST_ALL_FILED_IS_NULL() throws Exception {
 
             // given
@@ -417,18 +487,26 @@ class PostControllerTest {
 
             String editJson = objectMapper.writeValueAsString(postEdit);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             // expected
             mockMvc.perform(patch("/posts/{postId}", savedPost.getId())
                             .contentType(APPLICATION_JSON)
-                            .content(editJson))
-                    .andExpect(status().isBadRequest())
+                            .content(editJson)
+                            .headers(headers)
+                            .cookie(cookie)
+                    )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
                     .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.description").value(BAD_REQUEST.getDescription()))
+                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
-                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessage))
+                    .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
                     .andExpect(jsonPath("$.data[1].field").value("title"))
-                    .andExpect(jsonPath("$.data[1].message").value(titleValidationMessage))
+                    .andExpect(jsonPath("$.data[1].message").value(TITLE_VALIDATION_MESSAGE))
                     .andDo(print());
 
         }
@@ -445,13 +523,21 @@ class PostControllerTest {
 
             Post savedPost = postRepository.save(post);
 
+            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
             // expected
             mockMvc.perform(delete("/posts/{postId}", savedPost.getId() + 1L)
-                            .contentType(APPLICATION_JSON))
-                    .andExpect(status().isNotFound())
+                            .contentType(APPLICATION_JSON)
+                            .headers(headers)
+                            .cookie(cookie)
+                    )
                     .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
                     .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.description").value(NOT_FOUND.getDescription()))
+                    .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
                     .andDo(print());
