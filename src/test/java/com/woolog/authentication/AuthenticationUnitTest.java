@@ -1,4 +1,4 @@
-package com.woolog.Authentication;
+package com.woolog.authentication;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
