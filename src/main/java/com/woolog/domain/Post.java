@@ -25,6 +25,9 @@ public class Post extends BaseTimeEntity {
     @Lob
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
+
     @Builder
     public Post(String title, String content) {
         this.title = title;
