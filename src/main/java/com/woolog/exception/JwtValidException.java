@@ -1,6 +1,6 @@
 package com.woolog.exception;
 
-import com.woolog.response.CommonResponseField;
+import com.woolog.response.ExceptionResponseData;
 import com.woolog.response.ResponseStatus;
 import io.jsonwebtoken.JwtException;
 
@@ -17,8 +17,8 @@ public class JwtValidException extends JwtException implements CustomException {
     }
 
     @Override
-    public CommonResponseField getErrorResponse() {
-        return CommonResponseField
+    public ExceptionResponseData getErrorResponse() {
+        return ExceptionResponseData
                 .builder()
                 .build();
     }

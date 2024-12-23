@@ -1,6 +1,6 @@
 package com.woolog.exception;
 
-import com.woolog.response.CommonResponseField;
+import com.woolog.response.ExceptionResponseData;
 import com.woolog.response.ResponseStatus;
 import org.springframework.security.core.AuthenticationException;
 
@@ -21,8 +21,8 @@ public class MemberAuthenticationException extends AuthenticationException imple
     }
 
     @Override
-    public CommonResponseField getErrorResponse() {
-        return CommonResponseField.builder()
+    public ExceptionResponseData getErrorResponse() {
+        return ExceptionResponseData.builder()
                 .field(this.field)
                 .message(this.message)
                 .build();

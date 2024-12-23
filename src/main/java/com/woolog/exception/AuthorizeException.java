@@ -1,6 +1,6 @@
 package com.woolog.exception;
 
-import com.woolog.response.CommonResponseField;
+import com.woolog.response.ExceptionResponseData;
 import com.woolog.response.ResponseStatus;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -18,8 +18,8 @@ public class AuthorizeException extends AccessDeniedException implements CustomE
     }
 
     @Override
-    public CommonResponseField getErrorResponse() {
-        return CommonResponseField
+    public ExceptionResponseData getErrorResponse() {
+        return ExceptionResponseData
                 .builder()
                 .build();
     }

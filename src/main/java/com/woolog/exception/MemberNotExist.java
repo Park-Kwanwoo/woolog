@@ -1,6 +1,6 @@
 package com.woolog.exception;
 
-import com.woolog.response.CommonResponseField;
+import com.woolog.response.ExceptionResponseData;
 import com.woolog.response.ResponseStatus;
 
 public class MemberNotExist extends WoologException implements CustomException {
@@ -21,8 +21,8 @@ public class MemberNotExist extends WoologException implements CustomException {
     }
 
     @Override
-    public CommonResponseField getErrorResponse() {
-        return CommonResponseField.builder()
+    public ExceptionResponseData getErrorResponse() {
+        return ExceptionResponseData.builder()
                 .field(this.field)
                 .message(this.message)
                 .build();
