@@ -2,8 +2,8 @@ package com.woolog.controller;
 
 import com.woolog.exception.CustomException;
 import com.woolog.exception.WoologException;
-import com.woolog.response.CommonResponse;
-import com.woolog.response.CommonResponseField;
+import com.woolog.response.ApiResponse;
+import com.woolog.response.ExceptionResponseData;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,24 +22,24 @@ import static com.woolog.response.ResponseStatus.BAD_REQUEST;
 public class WoologExceptionController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public CommonResponse<CommonResponseField> validExceptionHandler(MethodArgumentNotValidException e) {
+    public ApiResponse<ExceptionResponseData> validExceptionHandler(MethodArgumentNotValidException e) {
 
-        CommonResponse<CommonResponseField> commonResponse = new CommonResponse<>(BAD_REQUEST);
+        ApiResponse<ExceptionResponseData> apiResponse = new ApiResponse<>(BAD_REQUEST);
         List<FieldError> fieldErrors = e.getFieldErrors();
 
         for (FieldError fieldError : fieldErrors) {
-            commonResponse.addData(new CommonResponseField(fieldError.getField(), fieldError.getDefaultMessage()));
+            apiResponse.addData(new ExceptionResponseData(fieldError.getField(), fieldError.getDefaultMessage()));
         }
 
-        return commonResponse;
+        return apiResponse;
     }
 
     @ExceptionHandler(value = {WoologException.class, AuthenticationException.class, JwtException.class, AccessDeniedException.class})
-    public CommonResponse<CommonResponseField> woologExceptionHandler(CustomException e) {
+    public ApiResponse<ExceptionResponseData> woologExceptionHandler(CustomException e) {
 
-        CommonResponse<CommonResponseField> commonResponse = new CommonResponse<>(e.getHttpStatus());
-        commonResponse.addData(e.getErrorResponse());
+        ApiResponse<ExceptionResponseData> apiResponse = new ApiResponse<>(e.getHttpStatus());
+        apiResponse.addData(e.getErrorResponse());
 
-        return commonResponse;
+        return apiResponse;
     }
 }
