@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<RequestMatcher> EXCLUDE_PATH_PATTERNS =
             List.of(new AntPathRequestMatcher("/posts/{postId}", "GET"),
-                    new AntPathRequestMatcher("/h2-console", "GET"),
+                    new AntPathRequestMatcher("/h2-console/**"),
                     new AntPathRequestMatcher("/members/signup", "POST"),
                     new AntPathRequestMatcher("/"),
                     new AntPathRequestMatcher("/auth/login", "POST"),
@@ -66,9 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             try {
                 if (jwtTokenGenerator.validateToken(accessToken)) {
-                    claims = jwtTokenGenerator.getPayload(accessToken);
+                    claims = jwtTokenGenerator.parseToken(accessToken);
                 } else if (jwtTokenGenerator.validateToken(refreshToken)) {
-                    claims = jwtTokenGenerator.getPayload(refreshToken);
+                    claims = jwtTokenGenerator.parseToken(refreshToken);
                 }
 
                 String subject = claims.getSubject();
@@ -90,6 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean isExclude(HttpServletRequest request) {
         for (RequestMatcher excludePathPattern : EXCLUDE_PATH_PATTERNS) {
             if (excludePathPattern.matches(request)) {
+
                 return true;
             }
         }

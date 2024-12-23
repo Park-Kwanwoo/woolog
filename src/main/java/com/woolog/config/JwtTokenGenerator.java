@@ -3,7 +3,6 @@ package com.woolog.config;
 import com.woolog.exception.JwtValidException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -69,18 +68,23 @@ public class JwtTokenGenerator {
     public boolean validateToken(String token) {
 
         try {
-            Claims claims = getPayload(token);
+            Claims claims = parseToken(token);
             return !claims.getExpiration().before(new Date());
         } catch (JwtException e) {
             throw new JwtValidException();
         }
     }
 
-    public Claims getPayload(String token) {
+    public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(this.getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public String getSubject(String token) {
+        return parseToken(token)
+                .getSubject();
     }
 }
