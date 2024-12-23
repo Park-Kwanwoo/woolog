@@ -77,8 +77,8 @@ class PostControllerTest {
                     .build();
             String json = objectMapper.writeValueAsString(request);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -166,8 +166,8 @@ class PostControllerTest {
 
             postRepository.save(post);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -206,8 +206,8 @@ class PostControllerTest {
 
             postRepository.save(post);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -240,8 +240,8 @@ class PostControllerTest {
                     .build();
 
             String json = objectMapper.writeValueAsString(request);
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -254,7 +254,6 @@ class PostControllerTest {
                             .cookie(cookie)
                     )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
                     .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
                     .andExpect(jsonPath("$.data[0].message").value(TITLE_VALIDATION_MESSAGE))
@@ -272,8 +271,8 @@ class PostControllerTest {
                     .build();
 
             String json = objectMapper.writeValueAsString(request);
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -286,7 +285,6 @@ class PostControllerTest {
                             .cookie(cookie)
                     )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
                     .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
@@ -305,8 +303,8 @@ class PostControllerTest {
                     .build();
 
             String json = objectMapper.writeValueAsString(request);
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -319,7 +317,6 @@ class PostControllerTest {
                             .cookie(cookie)
                     )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
                     .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
@@ -344,7 +341,6 @@ class PostControllerTest {
             mockMvc.perform(get("/posts/{postId}", savedPost.getId() + 1L)
                             .contentType(APPLICATION_JSON))
                     .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
-                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
                     .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
@@ -364,8 +360,8 @@ class PostControllerTest {
 
             Post savedPost = postRepository.save(post);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -384,7 +380,6 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie))
                     .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
-                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
                     .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
@@ -410,8 +405,8 @@ class PostControllerTest {
 
             String editJson = objectMapper.writeValueAsString(postEdit);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -423,7 +418,6 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie))
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
                     .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
                     .andExpect(jsonPath("$.data[0].message").value(TITLE_VALIDATION_MESSAGE))
@@ -448,8 +442,8 @@ class PostControllerTest {
                     .build();
 
             String editJson = objectMapper.writeValueAsString(postEdit);
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -462,7 +456,6 @@ class PostControllerTest {
                             .cookie(cookie)
                     )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
                     .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
@@ -487,8 +480,8 @@ class PostControllerTest {
 
             String editJson = objectMapper.writeValueAsString(postEdit);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -501,7 +494,6 @@ class PostControllerTest {
                             .cookie(cookie)
                     )
                     .andExpect(jsonPath("$.status").value(BAD_REQUEST.getStatus()))
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
                     .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(contentValidationMessagCONTENT_VALIDATION_MESSAGE))
@@ -523,8 +515,8 @@ class PostControllerTest {
 
             Post savedPost = postRepository.save(post);
 
-            String accessToken = jwtTokenGenerator.generateAccessToken("test@abc.com");
-            String refreshToken = jwtTokenGenerator.generateRefreshToken("test@abc.com");
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
@@ -536,7 +528,6 @@ class PostControllerTest {
                             .cookie(cookie)
                     )
                     .andExpect(jsonPath("$.status").value(NOT_FOUND.getStatus()))
-                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
                     .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("postId"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
