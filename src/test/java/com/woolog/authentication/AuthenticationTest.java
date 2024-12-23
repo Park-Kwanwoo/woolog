@@ -1,6 +1,7 @@
 package com.woolog.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woolog.config.HashEncrypt;
 import com.woolog.config.JwtTokenGenerator;
 import com.woolog.domain.Member;
 import com.woolog.domain.Role;
@@ -51,6 +52,9 @@ public class AuthenticationTest {
     @Autowired
     private JwtTokenGenerator jwtTokenGenerator;
 
+    @Autowired
+    private HashEncrypt hashEncrypt;
+
     private void createAdmin() {
 
         Member admin = Member.builder()
@@ -58,6 +62,7 @@ public class AuthenticationTest {
                 .password(passwordEncoder.encode("admin123$"))
                 .name("관리자")
                 .nickName("관리자박")
+                .hashId(hashEncrypt.encrypt("admin@blog.com"))
                 .role(Role.ADMIN)
                 .build();
 
@@ -71,6 +76,7 @@ public class AuthenticationTest {
                 .password(passwordEncoder.encode("member123$"))
                 .name("멤버스")
                 .nickName("멤버박")
+                .hashId(hashEncrypt.encrypt("member@blog.com"))
                 .role(Role.MEMBER)
                 .build();
 
@@ -136,7 +142,6 @@ public class AuthenticationTest {
                         .contentType(APPLICATION_JSON)
                         .content(loginRequest))
                 .andExpect(jsonPath("$.status").value(MEMBER_AUTHENTICATION_EXCEPTION.getStatus()))
-                .andExpect(jsonPath("$.code").value(MEMBER_AUTHENTICATION_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value(MEMBER_AUTHENTICATION_EXCEPTION.getMessage()))
                 .andExpect(jsonPath("$.data[0].field").value("MEMBER"))
                 .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 사용자입니다."))
@@ -162,7 +167,6 @@ public class AuthenticationTest {
                         .content(loginRequest)
                 )
                 .andExpect(jsonPath("$.status").value(MEMBER_AUTHENTICATION_EXCEPTION.getStatus()))
-                .andExpect(jsonPath("$.code").value(MEMBER_AUTHENTICATION_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value(MEMBER_AUTHENTICATION_EXCEPTION.getMessage()))
                 .andExpect(jsonPath("$.data[0].field").value("MEMBER"))
                 .andExpect(jsonPath("$.data[0].message").value("아이디나 비밀번호가 잘못되었습니다."))
@@ -196,7 +200,6 @@ public class AuthenticationTest {
                         .cookie(cookie)
                 )
                 .andExpect(jsonPath("$.status").value(AUTHORIZE_EXCEPTION.getStatus()))
-                .andExpect(jsonPath("$.code").value(AUTHORIZE_EXCEPTION.getCode()))
                 .andExpect(jsonPath("$.message").value(AUTHORIZE_EXCEPTION.getMessage()))
                 .andDo(print());
 

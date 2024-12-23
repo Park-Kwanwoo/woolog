@@ -1,5 +1,6 @@
 package com.woolog.annotation;
 
+import com.woolog.config.HashEncrypt;
 import com.woolog.domain.Member;
 import com.woolog.domain.Role;
 import com.woolog.repository.MemberRepository;
@@ -24,9 +25,12 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MockUserFactory(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    private final HashEncrypt hashEncrypt;
+
+    public MockUserFactory(MemberRepository memberRepository, PasswordEncoder passwordEncoder, HashEncrypt hashEncrypt) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.hashEncrypt = hashEncrypt;
     }
 
     private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
@@ -44,6 +48,7 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
                 .password(passwordEncoder.encode(password))
                 .name(name)
                 .nickName(nickname)
+                .hashId(hashEncrypt.encrypt(email))
                 .role(Role.ADMIN)
                 .build();
 
