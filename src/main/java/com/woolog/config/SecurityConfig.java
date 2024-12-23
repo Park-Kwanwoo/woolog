@@ -41,6 +41,7 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtTokenGenerator jwtTokenGenerator;
+    private final HashEncrypt hashEncrypt;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -95,7 +96,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomLoginSuccessHandler(jwtTokenGenerator);
+        return new CustomLoginSuccessHandler(jwtTokenGenerator, hashEncrypt, objectMapper);
     }
 
     @Bean

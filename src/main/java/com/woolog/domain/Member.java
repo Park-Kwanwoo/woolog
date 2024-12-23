@@ -36,21 +36,36 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Column(unique = true, nullable = false)
+    private String hashId;
+
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
 
     @Builder
-    public Member(Long id, String name, String email, String password, String nickName, Role role) {
+    public Member(Long id, String name, String email, String password, String nickName, String hashId, Role role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.nickName = nickName;
+        this.hashId = hashId;
         this.role = role;
+    }
+
+    public MemberEditor.MemberEditorBuilder toEditor() {
+        return MemberEditor.builder()
+                .nickName(this.nickName)
+                .password(this.password);
+
     }
 
     public boolean matchPassword(String rawPassword) {
         return this.getPassword().matches(rawPassword);
     }
 
+    public void edit(MemberEditor memberEditor) {
+        this.nickName = memberEditor.getNickName();
+        this.password = memberEditor.getPassword();
+    }
 }
