@@ -39,8 +39,11 @@ public class Member extends BaseTimeEntity {
     @Column(unique = true, nullable = false)
     private String hashId;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Member(Long id, String name, String email, String password, String nickName, String hashId, Role role) {
@@ -58,10 +61,6 @@ public class Member extends BaseTimeEntity {
                 .nickName(this.nickName)
                 .password(this.password);
 
-    }
-
-    public boolean matchPassword(String rawPassword) {
-        return this.getPassword().matches(rawPassword);
     }
 
     public void edit(MemberEditor memberEditor) {
