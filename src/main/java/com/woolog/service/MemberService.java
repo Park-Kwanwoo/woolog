@@ -1,25 +1,22 @@
 package com.woolog.service;
 
 import com.woolog.config.HashEncrypt;
-import com.woolog.config.JwtTokenGenerator;
 import com.woolog.domain.Member;
 
 import com.woolog.domain.MemberEditor;
 import com.woolog.exception.DuplicateEmailException;
 import com.woolog.exception.DuplicateNickNameException;
+import com.woolog.exception.MemberInfoNotValidException;
 import com.woolog.exception.MemberNotExist;
 import com.woolog.repository.MemberRepository;
 import com.woolog.request.MemberEdit;
 import com.woolog.request.Signup;
 import com.woolog.response.MemberResponse;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.NoSuchAlgorithmException;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +29,7 @@ public class MemberService {
 
     public void singup(Signup signup) {
 
-        if (memberRepository.findMemberByEmail(signup.getEmail()).isEmpty()) {
+        if (memberRepository.findByEmail(signup.getEmail()).isEmpty()) {
             if (memberRepository.findByNickName(signup.getNickName()).isEmpty()) {
                 Member member = signup.toMember(passwordEncoder, hashEncrypt);
                 log.info("{}", member.getHashId());
@@ -45,16 +42,21 @@ public class MemberService {
         }
     }
 
-    public MemberResponse getMember(String memberHashId) {
+    public MemberResponse getMember(String memberHashId, String email) {
 
         Member member = memberRepository.findByHashId(memberHashId)
                 .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 사용자입니다."));
+
+        if (!member.getEmail().equals(email)) {
+            throw new MemberInfoNotValidException();
+        }
 
         return MemberResponse.of(member);
     }
 
     @Transactional
     public void editMemberInfo(String memberHashId, MemberEdit memberEdit) {
+
         Member member = memberRepository.findByHashId(memberHashId)
                 .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 사용자입니다."));
 

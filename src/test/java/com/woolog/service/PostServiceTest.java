@@ -1,11 +1,13 @@
 package com.woolog.service;
 
+import com.woolog.domain.Member;
 import com.woolog.domain.Post;
 import com.woolog.exception.PostNotFound;
-import com.woolog.repository.PostRepository;
-import com.woolog.request.PagingRequest;
-import com.woolog.request.PostCreate;
-import com.woolog.request.PostEdit;
+import com.woolog.repository.MemberRepository;
+import com.woolog.repository.post.PostRepository;
+import com.woolog.request.post.PagingRequest;
+import com.woolog.request.post.PostCreate;
+import com.woolog.request.post.PostEdit;
 import com.woolog.response.PostResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,15 +30,11 @@ class PostServiceTest {
     @Mock
     private PostRepository postRepository;
 
+    @Mock
+    private MemberRepository memberRepository;
+
     @InjectMocks
     private PostService postService;
-
-    private PostCreate createPostRequest() {
-        return PostCreate.builder()
-                .title("제목입니다.")
-                .content("내용")
-                .build();
-    }
 
     @Nested
     @DisplayName("성공 케이스")
@@ -47,9 +45,10 @@ class PostServiceTest {
 
             // given
             when(postRepository.save(any(Post.class))).thenReturn(null);
+            when(memberRepository.findByEmail(anyString())).thenReturn(Optional.ofNullable(Member.builder().build()));
 
             // when
-            postService.write(createPostRequest());
+            postService.write(new PostCreate("dd", "dd"), "fake@blog.com");
 
             // then
             verify(postRepository, times(1)).save(any(Post.class));
@@ -67,6 +66,10 @@ class PostServiceTest {
                     .content("내용")
                     .build();
 
+            Member member = Member.builder()
+                    .nickName("fakeNickName")
+                    .build();
+            fakePost.setMember(member);
             when(postRepository.findById(fakePostId)).thenReturn(Optional.ofNullable(fakePost));
 
             // when
@@ -107,6 +110,12 @@ class PostServiceTest {
                     .title("수정 전 제목")
                     .content("수정 전 내용")
                     .build();
+
+            Member member = Member.builder()
+                    .nickName("fakeNickname")
+                    .build();
+
+            savedPost.setMember(member);
 
             PostEdit postEdit = PostEdit.builder()
                     .title("수정 후 제목")

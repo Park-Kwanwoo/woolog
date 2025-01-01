@@ -6,6 +6,7 @@ import com.woolog.response.MemberResponse;
 import com.woolog.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,8 +21,8 @@ public class MemberController {
     }
 
     @GetMapping("/members/{memberHashId}")
-    public MemberResponse getMember(@PathVariable String memberHashId) {
-        return memberService.getMember(memberHashId);
+    public MemberResponse getMember(@PathVariable String memberHashId, @AuthenticationPrincipal String email) {
+        return memberService.getMember(memberHashId, email);
     }
 
     @PatchMapping("/members/{memberHashId}")

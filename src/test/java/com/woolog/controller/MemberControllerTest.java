@@ -1,6 +1,7 @@
 package com.woolog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woolog.annotation.CustomWithMockUser;
 import com.woolog.config.HashEncrypt;
 import com.woolog.config.JwtTokenGenerator;
 import com.woolog.domain.Member;
@@ -14,16 +15,15 @@ import com.woolog.request.Signup;
 import com.woolog.response.ResponseStatus;
 import com.woolog.service.MemberService;
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,22 +56,9 @@ class MemberControllerTest {
     @Autowired
     private HashEncrypt hashEncrypt;
 
-    @BeforeEach
+    @AfterEach
     void setUp() {
         memberRepository.deleteAll();
-    }
-
-    private Member memberCreate() {
-        Member member = Member.builder()
-                .email("member@blog.com")
-                .name("선점박")
-                .password("qwer123$")
-                .nickName("선점박")
-                .hashId(hashEncrypt.encrypt("member@blog.com"))
-                .role(Role.MEMBER)
-                .build();
-
-        return memberRepository.save(member);
     }
 
     @Nested
@@ -102,11 +89,14 @@ class MemberControllerTest {
         }
 
         @Test
+        @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
         @DisplayName("회원정보 가져오기")
         void GET_MEMBER_INFO() throws Exception {
 
             // given
-            Member member = memberCreate();
+            Member member = memberRepository.findByEmail("member@blog.com")
+                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+
             String memberHashId = member.getHashId();
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
@@ -128,11 +118,13 @@ class MemberControllerTest {
         }
 
         @Test
+        @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
         @DisplayName("회원정보 수정")
         void EDIT_MEMBER_INFO() throws Exception {
 
             // given
-            Member member = memberCreate();
+            Member member = memberRepository.findByEmail("member@blog.com")
+                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
             String memberHashId = member.getHashId();
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
@@ -156,7 +148,7 @@ class MemberControllerTest {
                             .cookie(cookie))
                     .andDo(print());
 
-            Member editMember = memberRepository.findMemberByEmail(member.getEmail())
+            Member editMember = memberRepository.findByEmail(member.getEmail())
                     .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
 
             assertEquals("닉네임 변경", editMember.getNickName());
@@ -164,11 +156,13 @@ class MemberControllerTest {
         }
 
         @Test
+        @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
         @DisplayName("회원탈퇴")
         void DELETE_MEMBER_INFO() throws Exception {
 
             // given
-            Member member = memberCreate();
+            Member member = memberRepository.findByEmail("member@blog.com")
+                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
             String memberHashId = member.getHashId();
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
@@ -184,7 +178,7 @@ class MemberControllerTest {
                             .cookie(cookie))
                     .andDo(print());
 
-            assertThrows(MemberNotExist.class, () -> memberService.getMember(memberHashId));
+            assertThrows(MemberNotExist.class, () -> memberService.getMember(memberHashId, member.getEmail()));
         }
     }
 

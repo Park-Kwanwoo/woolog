@@ -1,33 +1,44 @@
 package com.woolog.service;
 
+import com.woolog.domain.Member;
 import com.woolog.domain.Post;
 import com.woolog.domain.PostEditor;
+import com.woolog.exception.MemberNotExist;
 import com.woolog.exception.PostNotFound;
-import com.woolog.repository.PostRepository;
-import com.woolog.request.PagingRequest;
-import com.woolog.request.PostCreate;
-import com.woolog.request.PostEdit;
+import com.woolog.repository.MemberRepository;
+import com.woolog.repository.post.PostRepository;
+import com.woolog.request.post.PagingRequest;
+import com.woolog.request.post.PostCreate;
+import com.woolog.request.post.PostEdit;
 import com.woolog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
-    public void write(PostCreate postCreate) {
+    @Transactional
+    public void write(PostCreate postCreate, String email) {
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
 
         Post post = postCreate.toPost();
+        post.setMember(member);
+
         postRepository.save(post);
     }
 
+    @Transactional
     public PostResponse get(Long postId) {
 
         Post post = postRepository.findById(postId)
@@ -37,9 +48,11 @@ public class PostService {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .nickname(post.getMember().getNickName())
                 .build();
     }
 
+    @Transactional
     public List<PostResponse> getPagingList(PagingRequest pagingRequest) {
 
         return postRepository.getPagingList(pagingRequest).stream()
