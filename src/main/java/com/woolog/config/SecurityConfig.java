@@ -12,6 +12,7 @@ import com.woolog.security.handler.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -51,10 +52,16 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(tokenVerifyFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/member").hasAuthority("MEMBER")
+                        .requestMatchers("/posts/{postId}/comments", "POST").hasAnyAuthority("MEMBER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/posts").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/posts").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/posts").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/posts").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/posts/{postId}/comments").hasAnyAuthority("MEMBER", "ADMIN")
                         .anyRequest().permitAll())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
                 .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler()))
@@ -80,8 +87,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter tokenVerifyFilter() {
-        return new JwtAuthenticationFilter(jwtTokenGenerator, memberRepository);
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenGenerator);
     }
 
     @Bean
