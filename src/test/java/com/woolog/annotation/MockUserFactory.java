@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
@@ -33,15 +34,15 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
         this.hashEncrypt = hashEncrypt;
     }
 
-    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
     @Override
     public SecurityContext createSecurityContext(CustomWithMockUser withMockUser) {
 
         String email = withMockUser.email();
         String password = withMockUser.password();
-        String nickname = withMockUser.password();
+        String nickname = withMockUser.nickname();
         String name = withMockUser.name();
+        String role = withMockUser.role();
 
         Member member = Member.builder()
                 .email(email)
@@ -49,7 +50,7 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
                 .name(name)
                 .nickName(nickname)
                 .hashId(hashEncrypt.encrypt(email))
-                .role(Role.ADMIN)
+                .role(Role.valueOf(Role.class, role))
                 .build();
 
         memberRepository.save(member);
@@ -58,7 +59,7 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
         grantedAuthorities.add(new SimpleGrantedAuthority(member.getRole().name()));
 
         Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(member.getEmail(), member.getPassword(), grantedAuthorities);
-        SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
 
         return context;
