@@ -23,7 +23,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        Member member = memberRepository.findMemberByEmail((String) authentication.getPrincipal())
+        Member member = memberRepository.findByEmail((String) authentication.getPrincipal())
                 .orElseThrow(() -> new MemberAuthenticationException("MEMBER", "존재하지 않는 사용자입니다."));
 
         String email = member.getEmail();
