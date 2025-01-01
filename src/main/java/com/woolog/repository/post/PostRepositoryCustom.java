@@ -1,7 +1,7 @@
-package com.woolog.repository;
+package com.woolog.repository.post;
 
 import com.woolog.domain.Post;
-import com.woolog.request.PagingRequest;
+import com.woolog.request.post.PagingRequest;
 
 import java.util.List;
 

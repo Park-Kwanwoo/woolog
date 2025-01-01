@@ -1,4 +1,4 @@
-package com.woolog.request;
+package com.woolog.request.post;
 
 import lombok.Builder;
 import lombok.Getter;

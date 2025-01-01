@@ -1,4 +1,4 @@
-package com.woolog.repository;
+package com.woolog.repository.post;
 
 import com.woolog.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;

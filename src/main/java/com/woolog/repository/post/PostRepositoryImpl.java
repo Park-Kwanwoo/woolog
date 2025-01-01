@@ -1,8 +1,8 @@
-package com.woolog.repository;
+package com.woolog.repository.post;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.woolog.domain.Post;
-import com.woolog.request.PagingRequest;
+import com.woolog.request.post.PagingRequest;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
