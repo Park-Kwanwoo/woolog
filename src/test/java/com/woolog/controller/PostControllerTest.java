@@ -6,6 +6,7 @@ import com.woolog.config.JwtTokenGenerator;
 import com.woolog.domain.Member;
 import com.woolog.domain.Post;
 import com.woolog.domain.Role;
+import com.woolog.exception.MemberNotExist;
 import com.woolog.exception.PostNotFound;
 import com.woolog.repository.MemberRepository;
 import com.woolog.repository.post.PostRepository;
@@ -122,8 +123,7 @@ class PostControllerTest {
                     .email("admin@blog.com")
                     .password("qwer123$")
                     .name("관리자")
-                    .nickName("테스터박")
-                    .hashId("hashId")
+                    .nickname("테스터박")
                     .role(Role.ADMIN)
                     .build();
 
@@ -160,8 +160,7 @@ class PostControllerTest {
                     .email("admin@blog.com")
                     .password("qwer123$")
                     .name("관리자")
-                    .nickName("테스터박")
-                    .hashId("hashId")
+                    .nickname("테스터박")
                     .role(Role.ADMIN)
                     .build();
 
@@ -195,8 +194,8 @@ class PostControllerTest {
         }
 
         @Test
-        @CustomWithMockUser
         @Transactional
+        @CustomWithMockUser
         @DisplayName("게시글 수정")
         void EDIT_POST() throws Exception {
 
@@ -206,9 +205,10 @@ class PostControllerTest {
                     .content("수정 전 내용")
                     .build();
 
-            Member admin = memberRepository.findAll().getFirst();
-            post.setMember(admin);
+            Member admin = memberRepository.findByEmail("admin@blog.com")
+                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
 
+            post.setMember(admin);
             postRepository.save(post);
 
             String accessToken = jwtTokenGenerator.generateAccessToken("admin@blog.com");

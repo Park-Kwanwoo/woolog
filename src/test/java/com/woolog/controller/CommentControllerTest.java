@@ -65,8 +65,7 @@ class CommentControllerTest {
                 .email("admin@blog.com")
                 .password("qwer123$")
                 .name("관리자")
-                .nickName("admin")
-                .hashId("testAdminHash")
+                .nickname("admin")
                 .role(Role.ADMIN)
                 .build();
 
@@ -155,17 +154,10 @@ class CommentControllerTest {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
-            MemberInfo memberInfo = MemberInfo.builder()
-                    .hashId(member.getHashId())
-                    .password("qwer123$")
-                    .build();
-
-            String request = objectMapper.writeValueAsString(memberInfo);
 
             // expected
             mockMvc.perform(delete("/comments/{commentId}",  savedComment.getId())
                             .contentType(APPLICATION_JSON)
-                            .content(request)
                             .headers(headers)
                             .cookie(cookie))
                     .andDo(print());

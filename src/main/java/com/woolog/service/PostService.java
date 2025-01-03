@@ -3,6 +3,7 @@ package com.woolog.service;
 import com.woolog.domain.Member;
 import com.woolog.domain.Post;
 import com.woolog.domain.PostEditor;
+import com.woolog.exception.MemberInfoNotValidException;
 import com.woolog.exception.MemberNotExist;
 import com.woolog.exception.PostNotFound;
 import com.woolog.repository.MemberRepository;
@@ -48,7 +49,7 @@ public class PostService {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .nickname(post.getMember().getNickName())
+                .nickname(post.getMember().getNickname())
                 .build();
     }
 
@@ -60,11 +61,17 @@ public class PostService {
                 .toList();
     }
 
-    @Transactional
-    public void edit(Long postId, PostEdit postEdit) {
+    @Transactional(readOnly = true)
+    public void edit(Long postId, PostEdit postEdit, String email) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+
+        Member member = post.getMember();
+
+        if (!member.getEmail().equals(email)) {
+            throw new MemberInfoNotValidException();
+        }
 
         PostEditor.PostEditorBuilder editorBuilder = post.toEditor();
 
@@ -76,10 +83,18 @@ public class PostService {
         post.edit(postEditor);
     }
 
-    public void delete(Long postId) {
+    @Transactional(readOnly = true)
+    public void delete(Long postId, String email) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+
+        Member member = post.getMember();
+
+        if (!member.getEmail().equals(email)) {
+            throw new MemberInfoNotValidException();
+        }
+
         postRepository.delete(post);
     }
 }

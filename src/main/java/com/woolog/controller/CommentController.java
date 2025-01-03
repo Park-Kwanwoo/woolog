@@ -1,6 +1,5 @@
 package com.woolog.controller;
 
-import com.woolog.request.MemberInfo;
 import com.woolog.request.comment.CommentCreate;
 import com.woolog.service.CommentService;
 import jakarta.validation.Valid;
@@ -20,7 +19,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public void delete(@PathVariable Long commentId, @RequestBody @Valid MemberInfo memberInfo, @AuthenticationPrincipal String email) {
-        commentService.delete(commentId, memberInfo, email);
+    public void delete(@PathVariable Long commentId, @AuthenticationPrincipal String email) {
+        commentService.delete(commentId, email);
     }
 }

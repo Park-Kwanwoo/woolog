@@ -30,14 +30,11 @@ public class Member extends BaseTimeEntity {
     private String password;
 
     @Column(nullable = false)
-    private String nickName;
+    private String nickname;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
-    @Column(unique = true, nullable = false)
-    private String hashId;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
@@ -46,25 +43,24 @@ public class Member extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public Member(Long id, String name, String email, String password, String nickName, String hashId, Role role) {
+    public Member(Long id, String name, String email, String password, String nickname, Role role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.nickName = nickName;
-        this.hashId = hashId;
+        this.nickname = nickname;
         this.role = role;
     }
 
     public MemberEditor.MemberEditorBuilder toEditor() {
         return MemberEditor.builder()
-                .nickName(this.nickName)
+                .nickname(this.nickname)
                 .password(this.password);
 
     }
 
     public void edit(MemberEditor memberEditor) {
-        this.nickName = memberEditor.getNickName();
+        this.nickname = memberEditor.getNickname();
         this.password = memberEditor.getPassword();
     }
 }

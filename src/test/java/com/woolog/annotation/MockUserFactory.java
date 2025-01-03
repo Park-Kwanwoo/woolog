@@ -26,12 +26,9 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private final HashEncrypt hashEncrypt;
-
-    public MockUserFactory(MemberRepository memberRepository, PasswordEncoder passwordEncoder, HashEncrypt hashEncrypt) {
+    public MockUserFactory(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
-        this.hashEncrypt = hashEncrypt;
     }
 
 
@@ -48,8 +45,7 @@ public class MockUserFactory implements WithSecurityContextFactory<CustomWithMoc
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .name(name)
-                .nickName(nickname)
-                .hashId(hashEncrypt.encrypt(email))
+                .nickname(nickname)
                 .role(Role.valueOf(Role.class, role))
                 .build();
 

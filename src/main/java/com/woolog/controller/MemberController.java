@@ -20,22 +20,20 @@ public class MemberController {
         memberService.singup(signup);
     }
 
-    @GetMapping("/members/{memberHashId}")
-    public MemberResponse getMember(@PathVariable String memberHashId, @AuthenticationPrincipal String email) {
-        return memberService.getMember(memberHashId, email);
+    @GetMapping("/members")
+    public MemberResponse getMember(@AuthenticationPrincipal String email) {
+        return memberService.getMember(email);
     }
 
-    @PatchMapping("/members/{memberHashId}")
-    public void editMemberInfo(@PathVariable String memberHashId, @RequestBody @Valid MemberEdit memberEdit) {
-        memberService.editMemberInfo(memberHashId, memberEdit);
+    @PatchMapping("/members")
+    public void editMemberInfo(@AuthenticationPrincipal String email, @RequestBody @Valid MemberEdit memberEdit) {
+        memberService.editMemberInfo(email, memberEdit);
     }
 
-    @DeleteMapping("/members/{memberHashId}")
-    public void deleteMember(@PathVariable String memberHashId) {
-        memberService.deleteMember(memberHashId);
+    @DeleteMapping("/members")
+    public void deleteMember(@AuthenticationPrincipal String email) {
+        memberService.deleteMember(email);
     }
-
-
 
     @GetMapping("/admin")
     public String admin() {
