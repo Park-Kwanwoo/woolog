@@ -1,22 +1,16 @@
 package com.woolog.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woolog.config.HashEncrypt;
 import com.woolog.config.JwtTokenGenerator;
-import com.woolog.response.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -25,14 +19,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     private final JwtTokenGenerator jwtTokenGenerator;
-    private final HashEncrypt hashEncrypt;
 
-    private final ObjectMapper objectMapper;
-
-    public CustomLoginSuccessHandler(JwtTokenGenerator jwtTokenGenerator, HashEncrypt hashEncrypt, ObjectMapper objectMapper) {
+    public CustomLoginSuccessHandler(JwtTokenGenerator jwtTokenGenerator) {
         this.jwtTokenGenerator = jwtTokenGenerator;
-        this.hashEncrypt = hashEncrypt;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -46,9 +35,8 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
     }
 
-    protected void setResponse(String email, HttpServletResponse response) throws IOException {
+    protected void setResponse(String email, HttpServletResponse response) {
 
-        String memberHashId = hashEncrypt.encrypt(email);
         String accessToken = jwtTokenGenerator.generateAccessToken(email);
         String refreshToken = jwtTokenGenerator.generateRefreshToken(email);
         String cookie = setCookie(refreshToken);
@@ -57,15 +45,6 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setHeader("Authorization", accessToken);
         response.setHeader("Set-Cookie", cookie);
-
-        ApiResponse<Map<String, String>> apiResponse =
-                ApiResponse.<Map<String, String>>builder()
-                        .status(HttpStatus.OK.value())
-                        .build();
-        Map<String, String> map = new HashMap<>();
-        map.put("memberHashId", memberHashId);
-        apiResponse.addData(map);
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
 
         log.info("access = {}", accessToken);
         log.info("refresh = {}", refreshToken);
