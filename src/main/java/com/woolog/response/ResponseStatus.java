@@ -23,7 +23,8 @@ public enum ResponseStatus {
     DUPLICATE_NICKNAME_EXCEPTION(401,"이미 존재하는 닉네임입니다."),
     MEMBER_NOT_EXIST(401,"존재하지 않는 회원입니다."),
     JWT_VERIFY_EXCEPTION(401,"유효하지 않은 토큰입니다."),
-    AUTHORIZE_EXCEPTION(401,"접근 권한이 없습니다.")
+    AUTHORIZE_EXCEPTION(401,"접근 권한이 없습니다."),
+    MEMBER_INFO_NOT_VALID_EXCEPTION(401,"인증정보가 일치하지 않습니다.")
     ;
 
     // WOOLOG ERROR CODE
