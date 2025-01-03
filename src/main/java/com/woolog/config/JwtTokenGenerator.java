@@ -1,6 +1,5 @@
 package com.woolog.config;
 
-import com.woolog.exception.JwtValidException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
@@ -31,7 +30,7 @@ public class JwtTokenGenerator {
     private String issuer;
 
 
-    public SecretKey getSecretKey() {
+    private SecretKey getSecretKey() {
         byte[] decodeKey = Base64.getDecoder().decode(this.secretKey);
         return Keys.hmacShaKeyFor(decodeKey);
     }
@@ -65,26 +64,26 @@ public class JwtTokenGenerator {
         return Date.from(Instant.now().plus(this.refreshExpirationTime, ChronoUnit.SECONDS));
     }
 
-    public boolean validateToken(String token) {
-
+    public Claims getPayload(String accessToken) {
         try {
-            Claims claims = parseToken(token);
-            return !claims.getExpiration().before(new Date());
+            return parseToken(accessToken).getPayload();
         } catch (JwtException e) {
-            throw new JwtValidException();
+            throw new JwtException(e.getMessage());
         }
     }
 
-    public Claims parseToken(String token) {
+    public Jws<Claims> parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(this.getSecretKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseSignedClaims(token);
     }
 
-    public String getSubject(String token) {
-        return parseToken(token)
-                .getSubject();
+    public boolean verifySubject(Claims access, Claims refresh) {
+        return access.getSubject().equals(refresh.getSubject());
+    }
+
+    public boolean verifyIssuer(Claims access, Claims refresh) {
+        return access.getIssuer().equals(this.issuer) && refresh.getIssuer().equals(this.issuer);
     }
 }

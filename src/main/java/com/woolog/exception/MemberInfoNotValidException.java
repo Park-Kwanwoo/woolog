@@ -13,11 +13,12 @@ public class MemberInfoNotValidException extends WoologException implements Cust
 
     @Override
     public ResponseStatus getHttpStatus() {
-        return null;
+        return ResponseStatus.MEMBER_INFO_NOT_VALID_EXCEPTION;
     }
 
     @Override
     public ExceptionResponseData getErrorResponse() {
-        return null;
+        return ExceptionResponseData.builder()
+                .build();
     }
 }
