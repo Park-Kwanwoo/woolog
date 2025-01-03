@@ -11,11 +11,11 @@ public class MemberEdit {
     private final String password;
 
     @NotBlank(message = "{NotBlank.nickname}")
-    private final String nickName;
+    private final String nickname;
 
     @Builder
-    public MemberEdit(String password, String nickName) {
+    public MemberEdit(String password, String nickname) {
         this.password = password;
-        this.nickName = nickName;
+        this.nickname = nickname;
     }
 }

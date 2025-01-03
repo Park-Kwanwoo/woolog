@@ -9,20 +9,20 @@ public class MemberResponse {
 
     private final String email;
     private final String name;
-    private final String nickName;
+    private final String nickname;
 
     @Builder
-    public MemberResponse(String email, String name, String nickName) {
+    public MemberResponse(String email, String name, String nickname) {
         this.email = email;
         this.name = name;
-        this.nickName = nickName;
+        this.nickname = nickname;
     }
 
     public static MemberResponse of(Member member) {
         return MemberResponse.builder()
                 .email(member.getEmail())
                 .name(member.getName())
-                .nickName(member.getNickName())
+                .nickname(member.getNickname())
                 .build();
     }
 }

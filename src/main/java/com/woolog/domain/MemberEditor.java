@@ -7,11 +7,11 @@ import lombok.Getter;
 public class MemberEditor {
 
     private final String password;
-    private final String nickName;
+    private final String nickname;
 
     @Builder
-    public MemberEditor(String password, String nickName) {
+    public MemberEditor(String password, String nickname) {
         this.password = password;
-        this.nickName = nickName;
+        this.nickname = nickname;
     }
 }

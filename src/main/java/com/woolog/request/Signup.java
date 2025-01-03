@@ -1,6 +1,5 @@
 package com.woolog.request;
 
-import com.woolog.config.HashEncrypt;
 import com.woolog.domain.Member;
 import com.woolog.domain.Role;
 import jakarta.validation.constraints.NotBlank;
@@ -21,24 +20,23 @@ public class Signup {
     private final String password;
 
     @NotBlank(message = "{NotBlank.nickname}")
-    private final String nickName;
+    private final String nickname;
 
 
     @Builder
-    public Signup(String email, String name, String password, String nickName) {
+    public Signup(String email, String name, String password, String nickname) {
         this.email = email;
         this.name = name;
         this.password = password;
-        this.nickName = nickName;
+        this.nickname = nickname;
     }
 
-    public Member toMember(PasswordEncoder passwordEncoder, HashEncrypt hashEncrypt) {
+    public Member toMember(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .email(this.email)
                 .name(this.name)
-                .nickName(this.nickName)
+                .nickname(this.nickname)
                 .password(passwordEncoder.encode(this.password))
-                .hashId(hashEncrypt.encrypt(this.email))
                 .role(Role.MEMBER)
                 .build();
     }
