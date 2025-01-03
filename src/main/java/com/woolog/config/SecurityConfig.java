@@ -1,14 +1,10 @@
 package com.woolog.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woolog.repository.MemberRepository;
 import com.woolog.security.filter.JsonLoginFilter;
 import com.woolog.security.filter.JwtAuthenticationFilter;
-import com.woolog.security.handler.CustomAccessDeniedHandler;
-import com.woolog.security.handler.CustomEntryPoint;
-import com.woolog.security.handler.CustomLoginFailureHandler;
-import com.woolog.security.handler.CustomLoginSuccessHandler;
-import com.woolog.repository.MemberRepository;
-import com.woolog.security.handler.CustomAuthenticationProvider;
+import com.woolog.security.handler.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +38,6 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtTokenGenerator jwtTokenGenerator;
-    private final HashEncrypt hashEncrypt;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -103,7 +98,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomLoginSuccessHandler(jwtTokenGenerator, hashEncrypt, objectMapper);
+        return new CustomLoginSuccessHandler(jwtTokenGenerator);
     }
 
     @Bean
