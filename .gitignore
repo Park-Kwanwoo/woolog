@@ -19,5 +19,6 @@ nodeenv-22
 ## http request
 src/main/resources/http/
 
-## yml
+## config
 src/main/resources/application-*
+src/main/resources/sql/
