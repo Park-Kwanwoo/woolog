@@ -2,22 +2,18 @@ package com.woolog.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.annotation.CustomWithMockUser;
-import com.woolog.config.HashEncrypt;
 import com.woolog.config.JwtTokenGenerator;
-import com.woolog.domain.Member;
-import com.woolog.domain.Role;
 import com.woolog.repository.MemberRepository;
 import com.woolog.request.Login;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
-import org.aspectj.util.Reflection;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,7 +30,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -99,6 +94,28 @@ public class AuthenticationTest {
                     })
                     .andDo(print());
         }
+
+        @Test
+        @CustomWithMockUser(email = "member@blog.com", password = "member123$")
+        @DisplayName("로그아웃")
+        void SUCCESS_LOGOUT() throws Exception {
+
+            // given
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
+            // expected
+            mockMvc.perform(post("/logout")
+                            .contentType(APPLICATION_JSON)
+                            .headers(headers)
+                            .cookie(cookie))
+                    .andDo(print());
+
+            assertNull(SecurityContextHolder.getContext().getAuthentication());
+        }
     }
 
     @Nested
@@ -121,7 +138,7 @@ public class AuthenticationTest {
             mockMvc.perform(post("/auth/login")
                             .contentType(APPLICATION_JSON)
                             .content(loginRequest))
-                    .andExpect(jsonPath("$.status").value(MEMBER_AUTHENTICATION_EXCEPTION.getStatus()))
+                    .andExpect(jsonPath("$.code").value(MEMBER_AUTHENTICATION_EXCEPTION.getCode()))
                     .andExpect(jsonPath("$.message").value(MEMBER_AUTHENTICATION_EXCEPTION.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("MEMBER"))
                     .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 사용자입니다."))
@@ -147,7 +164,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .content(loginRequest)
                     )
-                    .andExpect(jsonPath("$.status").value(MEMBER_AUTHENTICATION_EXCEPTION.getStatus()))
+                    .andExpect(jsonPath("$.code").value(MEMBER_AUTHENTICATION_EXCEPTION.getCode()))
                     .andExpect(jsonPath("$.message").value(MEMBER_AUTHENTICATION_EXCEPTION.getMessage()))
                     .andExpect(jsonPath("$.data[0].field").value("MEMBER"))
                     .andExpect(jsonPath("$.data[0].message").value("아이디나 비밀번호가 잘못되었습니다."))
@@ -181,7 +198,7 @@ public class AuthenticationTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(jsonPath("$.status").value(AUTHORIZE_EXCEPTION.getStatus()))
+                    .andExpect(jsonPath("$.code").value(AUTHORIZE_EXCEPTION.getCode()))
                     .andExpect(jsonPath("$.message").value(AUTHORIZE_EXCEPTION.getMessage()))
                     .andDo(print());
 
@@ -202,7 +219,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(401))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -222,7 +239,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(401))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -242,7 +259,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(401))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -273,7 +290,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(401))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -298,7 +315,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.status").value(401))
+                    .andExpect(jsonPath("$.code").value(401))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }

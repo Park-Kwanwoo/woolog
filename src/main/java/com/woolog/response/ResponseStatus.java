@@ -28,6 +28,6 @@ public enum ResponseStatus {
     ;
 
     // WOOLOG ERROR CODE
-    private final int status;
+    private final int code;
     private final String message;
 }

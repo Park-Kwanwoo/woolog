@@ -11,18 +11,18 @@ import java.util.List;
 @Getter
 public class ApiResponse<T> {
 
-    private int status;
+    private int code;
     private String message;
     private final List<T> data = new ArrayList<>();
 
     public ApiResponse(ResponseStatus responseStatus) {
-        this.status = responseStatus.getStatus();
+        this.code = responseStatus.getCode();
         this.message = responseStatus.getMessage();
     }
 
     @Builder
-    public ApiResponse(int status, String message) {
-        this.status = status;
+    public ApiResponse(int code, String message) {
+        this.code = code;
         this.message = message;
     }
 
