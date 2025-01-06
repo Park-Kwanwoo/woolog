@@ -1,9 +1,9 @@
 package com.woolog.security.filter;
 
 import com.woolog.config.JwtTokenGenerator;
-import com.woolog.exception.InvalidTokenException;
-import com.woolog.exception.JwtValidException;
-import com.woolog.exception.MemberInfoNotValidException;
+import com.woolog.domain.Member;
+import com.woolog.exception.*;
+import com.woolog.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -13,7 +13,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -21,6 +26,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +34,8 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenGenerator jwtTokenGenerator;
+    private final SecurityContextHolderStrategy strategy = SecurityContextHolder.getContextHolderStrategy();
+    private final MemberRepository memberRepository;
     private static final List<RequestMatcher> EXCLUDE_PATH_PATTERNS =
             List.of(new AntPathRequestMatcher("/posts/{postId}", "GET"),
                     new AntPathRequestMatcher("/h2-console/**"),
@@ -61,13 +69,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 String subject = access.getSubject();
+                Member member = memberRepository.findByEmail(subject)
+                        .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 회원입니다."));
+                String email = member.getEmail();
 
-                String principal = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                if (principal.isEmpty() || !principal.equals(subject)) {
+                if (!email.equals(subject)) {
                     throw new MemberInfoNotValidException();
                 }
 
-            } catch (JwtException | MemberInfoNotValidException e) {
+                String role = member.getRole().name();
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
+                UsernamePasswordAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(email, null, Collections.singletonList(authority));
+                strategy.getContext().setAuthentication(authenticated);
+
+            } catch (JwtException | MemberInfoNotValidException | MemberAuthenticationException e) {
                 SecurityContextHolder.clearContext();
                 request.setAttribute("exception", e);
             }
