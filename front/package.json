@@ -15,6 +15,7 @@
   "dependencies": {
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "class-transformer": "^0.5.1",
     "element-plus": "^2.8.8",
     "normalize.css": "^8.0.1",
     "pinia": "^2.2.6",
