@@ -29,10 +29,7 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         String email = (String) authentication.getPrincipal();
         setResponse(email, response);
-
-        setDefaultTargetUrl("http://localhost:5173/home");
-        super.onAuthenticationSuccess(request, response, authentication);
-
+        response.getWriter().write("");
     }
 
     protected void setResponse(String email, HttpServletResponse response) {
@@ -51,8 +48,11 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
     private String setCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
+                .domain("localhost")
                 .maxAge(Duration.ofDays(1))
-                .sameSite("Strict")
+                .sameSite("None")
+                .path("/")
+                .secure(true)
                 .build()
                 .toString();
     }
