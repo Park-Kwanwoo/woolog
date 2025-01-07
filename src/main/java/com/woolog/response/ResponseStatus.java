@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ResponseStatus {
 
     /**
-     * status : int
+     * code : int
      * message: String
      */
 
