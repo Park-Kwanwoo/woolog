@@ -1,8 +1,9 @@
 <script setup lang="ts">
 
-import axios from "axios";
-import Post from "@/entity/Post";
-import {reactive} from "vue";
+import {onMounted, reactive} from "vue";
+import PostWrite from "@/entity/post/PostWrite";
+import {container} from "tsyringe";
+import PostRepository from "@/respository/PostRepository";
 import router from "@/router";
 
 const props = defineProps({
@@ -12,37 +13,39 @@ const props = defineProps({
   }
 })
 
-const post = reactive<Post>({
-  _id: Number,
-  _title: "",
-  _content: ""
+const POST_REPOSITORY = container.resolve(PostRepository)
+
+type StateType = {
+  postEdit: PostWrite
+}
+
+const state = reactive<StateType>({
+  postEdit: new PostWrite()
 })
 
-axios.get<Post>(`/api/posts/${props.postId}`)
-  .then(response => {
-    post.id = response.data.id;
-    post.title = response.data.title;
-    post.content = response.data.content;
-  })
-  .catch(error => {
-    console.log(error)
-  })
+onMounted(() => {
+  POST_REPOSITORY.get(props.postId)
+    .then((post) => {
+      state.postEdit = post
+    })
+})
 
-const edit = () => {
-  axios.patch(`/api/posts/${props.postId}`, post.valueOf())
+function edit() {
+  POST_REPOSITORY.edit(state.postEdit, props.postId)
     .then(() => {
-      router.replace({name: 'read', params: {postId: props.postId}})
+      router.replace(`/read/${props.postId}`)
     })
 }
+
 </script>
 
 <template>
   <div class="mt-5">
-    <el-input v-model="post.title" type="text" placeholder="제목을 입력해주세요."/>
+    <el-input v-model="state.postEdit.title" readonly type="text" placeholder="제목을 입력해주세요."/>
   </div>
 
   <div class="mt-2">
-    <el-input v-model="post.content" type="textarea"></el-input>
+    <el-input v-model="state.postEdit.content" type="textarea"></el-input>
   </div>
 
   <div class="mt-2 d-flex justify-content-end">

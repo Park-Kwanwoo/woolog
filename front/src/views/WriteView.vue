@@ -1,32 +1,28 @@
 <script setup lang="ts">
 
-import {ref} from "vue";
-import axios from "axios";
-import router from "@/router";
+import {reactive} from "vue";
+import PostWrite from "@/entity/post/PostWrite";
+import {container} from "tsyringe";
+import PostRepository from "@/respository/PostRepository";
 
-const title = ref("")
-const content = ref("")
+const state = reactive({
+  postWrite: new PostWrite()
+})
 
-const write = function () {
-  axios.post("/api/posts", {
-    title: title.value,
-    content: content.value
-  })
-    .then(() => {
-      router.replace({name: "home"})
-    })
+const POST_REPOSITORY = container.resolve(PostRepository);
+
+function write() {
+  POST_REPOSITORY.write(state.postWrite)
 }
-
-
 </script>
 
 <template>
   <div class="mt-5">
-    <el-input v-model="title" type="text" placeholder="제목을 입력해주세요."/>
+    <el-input v-model="state.postWrite.title" type="text" placeholder="제목을 입력해주세요."/>
   </div>
 
   <div class="mt-2">
-    <el-input v-model="content" type="textarea"></el-input>
+    <el-input v-model="state.postWrite.content" type="textarea" rows="15" alt="내용"/>
   </div>
 
   <div class="mt-2">
