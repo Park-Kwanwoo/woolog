@@ -20,6 +20,7 @@
     "element-plus": "^2.8.8",
     "normalize.css": "^8.0.1",
     "pinia": "^2.2.6",
+    "pinia-plugin-persistedstate": "^4.2.0",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.8.0",
     "vue": "^3.5.12",
