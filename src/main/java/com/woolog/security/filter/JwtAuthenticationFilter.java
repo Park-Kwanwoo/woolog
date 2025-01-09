@@ -38,10 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final MemberRepository memberRepository;
     private static final List<RequestMatcher> EXCLUDE_PATH_PATTERNS =
             List.of(new AntPathRequestMatcher("/posts/{postId}", "GET"),
+                    new AntPathRequestMatcher("/posts/{postId}/comments", "GET"),
                     new AntPathRequestMatcher("/h2-console/**"),
                     new AntPathRequestMatcher("/members/signup", "POST"),
                     new AntPathRequestMatcher("/"),
                     new AntPathRequestMatcher("/auth/login", "POST"),
+                    new AntPathRequestMatcher("/auth/logout", "GET"),
                     new RegexRequestMatcher("^/posts(\\?page=\\d+(&size=\\d+)?)?$", "GET")
             );
 
