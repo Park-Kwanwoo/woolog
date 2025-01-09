@@ -4,16 +4,21 @@ import com.woolog.domain.Comment;
 import com.woolog.domain.Member;
 import com.woolog.domain.Post;
 import com.woolog.exception.CommentNotFound;
+import com.woolog.exception.MemberInfoNotValidException;
 import com.woolog.exception.MemberNotExist;
 import com.woolog.exception.PostNotFound;
 import com.woolog.repository.MemberRepository;
 import com.woolog.repository.comment.CommentRepository;
 import com.woolog.repository.post.PostRepository;
 import com.woolog.request.comment.CommentCreate;
+import com.woolog.request.post.PagingRequest;
+import com.woolog.response.CommentResponse;
+import com.woolog.response.PagingResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +47,13 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
+    public PagingResponse<CommentResponse> getList(PagingRequest pagingRequest, Long postId) {
+
+        PageImpl<Comment> comments = commentRepository.getList(pagingRequest, postId);
+        return new PagingResponse<>(comments, CommentResponse.class);
+    }
+
+    @Transactional
     public void delete(Long commentId, String email) {
 
         try {
@@ -52,7 +64,7 @@ public class CommentService {
 
             // 새로운 에러 생성
             if (!member.getEmail().equals(email)) {
-                throw new RuntimeException(email);
+                throw new MemberInfoNotValidException();
             }
 
             commentRepository.delete(comment);

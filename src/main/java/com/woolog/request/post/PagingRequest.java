@@ -2,6 +2,8 @@ package com.woolog.request.post;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -25,5 +27,9 @@ public class PagingRequest {
 
     public long getOffset() {
         return ((long) max(this.page, 1) - 1) * min(this.size, MAX_SIZE);
+    }
+
+    public Pageable getPageable() {
+        return PageRequest.of(this.page - 1, this.size);
     }
 }

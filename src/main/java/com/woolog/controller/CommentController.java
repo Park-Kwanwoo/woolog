@@ -1,6 +1,9 @@
 package com.woolog.controller;
 
 import com.woolog.request.comment.CommentCreate;
+import com.woolog.request.post.PagingRequest;
+import com.woolog.response.CommentResponse;
+import com.woolog.response.PagingResponse;
 import com.woolog.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,11 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public void write(@PathVariable Long postId, @RequestBody @Valid CommentCreate commentCreate, @AuthenticationPrincipal String email) {
         commentService.write(postId, commentCreate, email);
+    }
+
+    @GetMapping("/posts/{postId}/comments")
+    public PagingResponse<CommentResponse> getList(@PathVariable("postId") Long postId, @ModelAttribute @Valid PagingRequest pagingRequest) {
+        return commentService.getList(pagingRequest, postId);
     }
 
     @DeleteMapping("/comments/{commentId}")

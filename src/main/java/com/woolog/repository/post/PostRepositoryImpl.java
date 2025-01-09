@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.woolog.domain.Post;
 import com.woolog.request.post.PagingRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
@@ -15,12 +16,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Post> getPagingList(PagingRequest pagingRequest) {
+    public PageImpl<Post> getPagingList(PagingRequest pagingRequest) {
 
-        return jpaQueryFactory.selectFrom(post)
+        Long totalCount = jpaQueryFactory.select(post.count())
+                .from(post)
+                .fetchFirst();
+
+        List<Post> items = jpaQueryFactory.selectFrom(post)
                 .limit(pagingRequest.getSize())
                 .offset(pagingRequest.getOffset())
                 .orderBy(post.id.desc())
                 .fetch();
+
+        return new PageImpl<Post>(items, pagingRequest.getPageable(), totalCount);
     }
 }
