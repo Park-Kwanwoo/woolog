@@ -61,15 +61,16 @@ public class SecurityConfig {
                 .addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> {
-                    logout.logoutUrl("/logout")
+                    logout.logoutUrl("/auth/logout")
                             .permitAll();
-                    logout.logoutSuccessUrl("/");
+                    logout.logoutSuccessUrl("http://localhost:5173");
                 })
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/member").hasAuthority("MEMBER")
-                        .requestMatchers("/posts/{postId}/comments", "POST").hasAnyAuthority("MEMBER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/posts/{postId}/comments").hasAnyAuthority("MEMBER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/posts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/posts/{postId}/comments").permitAll()
                         .requestMatchers(HttpMethod.POST, "/posts").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/posts").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/posts").hasAuthority("ADMIN")
