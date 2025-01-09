@@ -10,17 +10,17 @@ import lombok.extern.jackson.Jacksonized;
 public class CommentCreate {
 
     @NotBlank(message = "{NotBlank.content}")
-    private final String comment;
+    private final String content;
 
     @Builder
     @Jacksonized
-    public CommentCreate(String comment) {
-        this.comment = comment;
+    public CommentCreate(String content) {
+        this.content = content;
     }
 
     public Comment toComment() {
         return Comment.builder()
-                .comment(this.comment)
+                .content(this.content)
                 .build();
     }
 }
