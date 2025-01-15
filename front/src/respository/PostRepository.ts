@@ -24,9 +24,16 @@ export default class PostRepository {
         Authorization: token.value
       }
     })
-      .then((res) => {
-        ElMessage.success('작성 성공')
-        router.replace('/')
+      .then((response) => {
+
+        const statusCode = response.statusCode
+        if (statusCode === 'ERROR') {
+          ElMessage.error('제목과 내용을 입력해주세요.')
+        } else {
+          ElMessage.success('작성 성공')
+          router.replace('/')
+        }
+
       })
       .catch((e) => {
         console.log(e);

@@ -1,23 +1,16 @@
 <script setup lang="ts">
 
 import Comment from "@/entity/comment/Comment";
-import {container} from "tsyringe";
-import CommentRepository from "@/respository/CommentRepository";
 
 const props = defineProps({
-  comment: Comment
+  comment: Comment,
 })
 
-const COMMENT_REPOSITORY = container.resolve(CommentRepository)
+const emit = defineEmits(['remove'])
 
-
-function remove() {
-  COMMENT_REPOSITORY.delete(props.comment?.id)
-    .then(() => {
-      location.reload();
-    })
+function remove(commentId) {
+  emit('remove', { commentId })
 }
-
 </script>
 
 <template>
@@ -27,7 +20,7 @@ function remove() {
   </div>
 
   <div class="commentInfo"> {{ props.comment.nickname }} | {{ props.comment.getDisplaySimpleCreatedAt() }}</div>
-  <div class="remove" @click="remove()">삭제</div>
+  <div class="remove" @click="remove(props.comment?.id)">삭제</div>
 </template>
 
 <style scoped>

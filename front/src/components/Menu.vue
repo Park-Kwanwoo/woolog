@@ -19,7 +19,7 @@ watch(
   () => {
     MEMBER_REPOSITORY.getProfile()
       .then((response) => {
-        state.isAdmin = response.admin
+        state.isAdmin = response.data.admin
       })
   }
 )
@@ -27,17 +27,16 @@ watch(
 onMounted(() => {
   MEMBER_REPOSITORY.getProfile()
     .then((response) => {
-      state.isAdmin = response.admin
+      const statusCode = response.statusCode
+      if (statusCode !== 'ERROR')
+        state.isAdmin = response.data.admin
     })
 })
 
 function logout() {
   MEMBER_REPOSITORY.logout()
-    .then((response) => {
-      tokenStore.deleteToken()
-      // 쿠키 삭제 vue-cookie 였나
-      state.isAdmin = null
-      localStorage.setItem('token', null)
+    .then(() => {
+      state.isAdmin = false
     });
 }
 </script>

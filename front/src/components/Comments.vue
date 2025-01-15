@@ -40,7 +40,20 @@ function getComments() {
 function writeComment() {
   COMMENT_REPOSITORY.write(state.commentWrite, props.postId)
     .then(() => {
-      location.reload()
+      state.commentWrite.content = ''
+      getComments()
+    })
+}
+
+function remove(...args) {
+  const commentId = args[0].commentId;
+  COMMENT_REPOSITORY.delete(commentId)
+    .then((response) => {
+      const statusCode = response.statusCode
+
+      if (statusCode !== 'ERROR') {
+        getComments()
+      }
     })
 }
 
@@ -52,7 +65,8 @@ function writeComment() {
     <div class="form">
       <div class="content-wrap">
         <h2 class="content">댓글</h2>
-        <el-input id="content" v-model="state.commentWrite.content"  placeholder="내용을 입력하세요." type="textarea" :rows="5" :autosize="{ minRows: 5, maxRows: 4 }"></el-input>
+        <el-input id="content" v-model="state.commentWrite.content" placeholder="내용을 입력하세요." type="textarea" :rows="5"
+                  :autosize="{ minRows: 5, maxRows: 4 }"></el-input>
       </div>
     </div>
 
@@ -61,7 +75,7 @@ function writeComment() {
 
   <ul class="comments">
     <li class="comment" v-for="comment in state.commentList.items" :key="comment.id">
-      <CommentComponent :comment="comment"/>
+      <CommentComponent :comment="comment" @remove="remove"/>
     </li>
   </ul>
 </template>

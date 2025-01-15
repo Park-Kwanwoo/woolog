@@ -6,6 +6,7 @@ export default class Comment {
   public id = 0
   public content = ''
   public nickname= ''
+  public postId = 0
   @Transform(({value}) => LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME), {toClassOnly: true})
   public create_at = LocalDateTime.now()
 

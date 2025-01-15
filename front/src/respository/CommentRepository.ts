@@ -4,6 +4,7 @@ import Comment from "@/entity/comment/Comment";
 import {storeToRefs} from "pinia";
 import {useTokenStore} from "@/stores/Token";
 import router from "@/router";
+import {ElMessage} from "element-plus";
 
 @singleton()
 export default class CommentRepository {
@@ -28,6 +29,13 @@ export default class CommentRepository {
         Authorization: token.value
       }
     })
+      .then((response) => {
+        if (response.statusCode == 'ERROR') {
+          ElMessage.error('댓글을 입력해주세요.')
+        } else {
+          ElMessage.success('작성 성공')
+        }
+      })
   }
 
   public delete(commentId: number) {

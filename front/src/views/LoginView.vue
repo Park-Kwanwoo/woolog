@@ -18,7 +18,7 @@ function doLogin() {
 
 <template>
   <el-row>
-    <el-col :span="6" :offset="7">
+    <el-col :span="10" :offset="7">
       <el-form label-position="top">
         <el-form-item label="이메일">
           <el-input v-model="state.login.email"></el-input>

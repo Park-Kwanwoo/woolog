@@ -44,14 +44,13 @@ export default class HttpRepository {
   public login(config: HttpRequestConfig) {
     return this.httpClient.request({...config, method: 'POST'})
       .then((response) => {
-        return response.headers['authorization']
+        return response;
       })
   }
 
   public logout(config: HttpRequestConfig) {
     return this.httpClient.request({...config, method: 'GET'})
       .then((response) => {
-
       })
   }
 }
