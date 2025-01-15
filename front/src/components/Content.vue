@@ -3,17 +3,17 @@
 </script>
 
 <template>
-  <el-main class="content">
-    <el-row>
-      <el-col>
-        <RouterView />
-      </el-col>
-    </el-row>
-  </el-main>
+  <div class="main">
+    <RouterView />
+  </div>
 </template>
 
-<style scoped>
-.content {
-  height: calc(100vh - 60px);
+<style scoped lang="scss">
+.main {
+  margin-top: 1.4rem;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1200px;
 }
 </style>
