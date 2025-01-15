@@ -23,26 +23,12 @@ import static com.woolog.response.ResponseStatus.BAD_REQUEST;
 public class WoologExceptionController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<ExceptionResponseData>> validExceptionHandler(MethodArgumentNotValidException e) {
-
-        ApiResponse<ExceptionResponseData> apiResponse = new ApiResponse<>(BAD_REQUEST);
-        List<FieldError> fieldErrors = e.getFieldErrors();
-
-        for (FieldError fieldError : fieldErrors) {
-            apiResponse.addData(new ExceptionResponseData(fieldError.getField(), fieldError.getDefaultMessage()));
-        }
-
-        return ResponseEntity.status(apiResponse.getCode())
-                .body(apiResponse);
+    public ApiResponse<?> validExceptionHandler(MethodArgumentNotValidException e) {
+        return ApiResponse.errorWithBingResult(e);
     }
 
     @ExceptionHandler(value = {WoologException.class, AuthenticationException.class, JwtException.class, AccessDeniedException.class})
-    public ResponseEntity<ApiResponse<ExceptionResponseData>> woologExceptionHandler(CustomException e) {
-
-        ApiResponse<ExceptionResponseData> apiResponse = new ApiResponse<>(e.getHttpStatus());
-        apiResponse.addData(e.getErrorResponse());
-
-        return ResponseEntity.status(apiResponse.getCode())
-                .body(apiResponse);
+    public ApiResponse<?> woologExceptionHandler(CustomException e) {
+        return ApiResponse.error(e.getMessage());
     }
 }

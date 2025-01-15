@@ -24,7 +24,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
         Member member = memberRepository.findByEmail((String) authentication.getPrincipal())
-                .orElseThrow(() -> new MemberAuthenticationException("MEMBER", "존재하지 않는 사용자입니다."));
+                .orElseThrow(MemberAuthenticationException::new);
 
         String email = member.getEmail();
         String encodedPassword = member.getPassword();
@@ -34,7 +34,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role);
 
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new MemberAuthenticationException("MEMBER", "아이디나 비밀번호가 잘못되었습니다.");
+            throw new MemberAuthenticationException();
         }
 
         return new UsernamePasswordAuthenticationToken(email, encodedPassword, Collections.singletonList(simpleGrantedAuthority));

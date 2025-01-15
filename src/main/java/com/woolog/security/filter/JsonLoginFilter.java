@@ -39,10 +39,8 @@ public class JsonLoginFilter extends AbstractAuthenticationProcessingFilter {
         } else {
             Login login = objectMapper.readValue(request.getInputStream(), Login.class);
 
-            if (login.getEmail().isEmpty()) {
-                throw new LoginArgumentValidation("email", "아이디를 입력해주세요");
-            } else if (login.getPassword().isEmpty()) {
-                throw new LoginArgumentValidation("password", "비밀번호를 입력해주세요.");
+            if (login.getEmail().isEmpty() || login.getPassword().isEmpty()) {
+                throw new LoginArgumentValidation();
             }
 
             UsernamePasswordAuthenticationToken unauthenticatedLoginInfo = UsernamePasswordAuthenticationToken.unauthenticated(login.getEmail(), login.getPassword());

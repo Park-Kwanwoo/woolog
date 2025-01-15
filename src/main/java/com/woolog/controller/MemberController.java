@@ -2,6 +2,7 @@ package com.woolog.controller;
 
 import com.woolog.request.MemberEdit;
 import com.woolog.request.Signup;
+import com.woolog.response.ApiResponse;
 import com.woolog.response.MemberResponse;
 import com.woolog.service.MemberService;
 import jakarta.validation.Valid;
@@ -21,8 +22,8 @@ public class MemberController {
     }
 
     @GetMapping("/members")
-    public MemberResponse getMember(@AuthenticationPrincipal String email) {
-        return memberService.getMember(email);
+    public ApiResponse<MemberResponse> getMember(@AuthenticationPrincipal String email) {
+        return ApiResponse.successWithContent(memberService.getMember(email));
     }
 
     @PatchMapping("/members")

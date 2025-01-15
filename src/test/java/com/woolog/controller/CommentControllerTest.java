@@ -104,7 +104,7 @@ class CommentControllerTest {
             // given
             Post post = createPost();
             CommentCreate commentCreate = CommentCreate.builder()
-                    .comment("댓글 달기")
+                    .content("댓글 달기")
                     .build();
 
             String request = objectMapper.writeValueAsString(commentCreate);
@@ -125,7 +125,7 @@ class CommentControllerTest {
 
             Comment comment = commentRepository.findAll().getFirst();
 
-            assertEquals("댓글 달기", comment.getComment());
+            assertEquals("댓글 달기", comment.getContent());
             assertEquals(comment.getPost().getId(), post.getId());
         }
 
@@ -139,9 +139,9 @@ class CommentControllerTest {
             // given
             Post post = createPost();
             Member member = memberRepository.findByEmail("member@blog.com")
-                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 회원입니다."));
+                    .orElseThrow(MemberNotExist::new);
             Comment comment = Comment.builder()
-                    .comment("댓글 달기")
+                    .content("댓글 달기")
                     .build();
             comment.setMember(member);
             post.addComment(comment);

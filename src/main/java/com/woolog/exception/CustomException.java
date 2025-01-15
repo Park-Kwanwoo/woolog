@@ -5,7 +5,5 @@ import com.woolog.response.ResponseStatus;
 
 public interface CustomException {
 
-    ResponseStatus getHttpStatus();
-
-    ExceptionResponseData getErrorResponse();
+    String getMessage();
 }

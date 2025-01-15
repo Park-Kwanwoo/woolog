@@ -1,29 +1,15 @@
 package com.woolog.exception;
 
-import com.woolog.response.ExceptionResponseData;
-import com.woolog.response.ResponseStatus;
-
 public class DuplicateNickNameException extends WoologException implements CustomException {
 
-    private final String field;
-    private final String message;
+    private static final String MESSAGE = "중복된 닉네임입니다.";
 
-    public DuplicateNickNameException(String field, String message) {
-        super(message);
-        this.field = field;
-        this.message = message;
+    public DuplicateNickNameException() {
+        super(MESSAGE);
     }
 
     @Override
-    public ResponseStatus getHttpStatus() {
-        return ResponseStatus.DUPLICATE_NICKNAME_EXCEPTION;
-    }
-
-    @Override
-    public ExceptionResponseData getErrorResponse() {
-        return ExceptionResponseData.builder()
-                .field(this.field)
-                .message(this.message)
-                .build();
+    public String getMessage() {
+        return super.getMessage();
     }
 }

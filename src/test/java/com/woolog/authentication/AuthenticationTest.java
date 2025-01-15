@@ -138,10 +138,8 @@ public class AuthenticationTest {
             mockMvc.perform(post("/auth/login")
                             .contentType(APPLICATION_JSON)
                             .content(loginRequest))
-                    .andExpect(jsonPath("$.code").value(MEMBER_AUTHENTICATION_EXCEPTION.getCode()))
-                    .andExpect(jsonPath("$.message").value(MEMBER_AUTHENTICATION_EXCEPTION.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("MEMBER"))
-                    .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 사용자입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("인증정보가 일치하지 않습니다."))
                     .andDo(print());
 
         }
@@ -164,10 +162,8 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .content(loginRequest)
                     )
-                    .andExpect(jsonPath("$.code").value(MEMBER_AUTHENTICATION_EXCEPTION.getCode()))
-                    .andExpect(jsonPath("$.message").value(MEMBER_AUTHENTICATION_EXCEPTION.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("MEMBER"))
-                    .andExpect(jsonPath("$.data[0].message").value("아이디나 비밀번호가 잘못되었습니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("인증정보가 일치하지 않습니다."))
                     .andDo(print());
 
         }
@@ -198,8 +194,8 @@ public class AuthenticationTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(jsonPath("$.code").value(AUTHORIZE_EXCEPTION.getCode()))
-                    .andExpect(jsonPath("$.message").value(AUTHORIZE_EXCEPTION.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."))
                     .andDo(print());
 
         }
@@ -219,7 +215,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.code").value(401))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -239,7 +235,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.code").value(401))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -259,7 +255,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.code").value(401))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -290,7 +286,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.code").value(401))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }
@@ -315,7 +311,7 @@ public class AuthenticationTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.code").value(401))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.message").value("유효하지 않은 토큰입니다."))
                     .andDo(print());
         }

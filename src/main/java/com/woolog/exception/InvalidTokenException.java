@@ -1,29 +1,15 @@
 package com.woolog.exception;
 
-import com.woolog.response.ExceptionResponseData;
-import com.woolog.response.ResponseStatus;
-
 public class InvalidTokenException extends WoologException implements CustomException {
 
-    private final String field;
-    private final String message;
+    private static final String MESSAGE = "토큰 값이 존재하지 않습니다.";
 
-    public InvalidTokenException(String field, String message) {
-        super(message);
-        this.field = field;
-        this.message = message;
+    public InvalidTokenException() {
+        super(MESSAGE);
     }
 
     @Override
-    public ResponseStatus getHttpStatus() {
-        return null;
-    }
-
-    @Override
-    public ExceptionResponseData getErrorResponse() {
-        return ExceptionResponseData.builder()
-                .field(this.field)
-                .message(this.message)
-                .build();
+    public String getMessage() {
+        return super.getMessage();
     }
 }

@@ -92,7 +92,7 @@ class MemberControllerTest {
 
             // given
             Member member = memberRepository.findByEmail("member@blog.com")
-                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                    .orElseThrow(MemberNotExist::new);
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
             String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
@@ -119,7 +119,7 @@ class MemberControllerTest {
 
             // given
             Member member = memberRepository.findByEmail("member@blog.com")
-                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                    .orElseThrow(MemberNotExist::new);
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
             String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
@@ -143,7 +143,7 @@ class MemberControllerTest {
                     .andDo(print());
 
             Member editMember = memberRepository.findByEmail(member.getEmail())
-                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                    .orElseThrow(MemberNotExist::new);
 
             assertEquals("닉네임 변경", editMember.getNickname());
 
@@ -156,7 +156,7 @@ class MemberControllerTest {
 
             // given
             Member member = memberRepository.findByEmail("member@blog.com")
-                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                    .orElseThrow(MemberNotExist::new);
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
             String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
@@ -191,8 +191,9 @@ class MemberControllerTest {
             mockMvc.perform(post("/members/signup")
                             .content(json)
                             .contentType(APPLICATION_JSON))
-                    .andExpect(jsonPath("$.code").value(ResponseStatus.BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(ResponseStatus.BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.data.length()").value(4))
+
                     .andExpect(result ->
                             assertInstanceOf(MethodArgumentNotValidException.class, result.getResolvedException()))
                     .andDo(print());
@@ -225,10 +226,8 @@ class MemberControllerTest {
             mockMvc.perform(post("/members/signup")
                             .content(json)
                             .contentType(APPLICATION_JSON))
-                    .andExpect(jsonPath("$.code").value(ResponseStatus.DUPLICATE_EMAIL_EXCEPTION.getCode()))
-                    .andExpect(jsonPath("$.message").value(ResponseStatus.DUPLICATE_EMAIL_EXCEPTION.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("email"))
-                    .andExpect(jsonPath("$.data[0].message").value("이미 존재하는 이메일입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("중복된 이메일입니다."))
                     .andExpect(result ->
                             assertInstanceOf(DuplicateEmailException.class, result.getResolvedException()))
                     .andDo(print());
@@ -261,10 +260,8 @@ class MemberControllerTest {
             mockMvc.perform(post("/members/signup")
                             .content(json)
                             .contentType(APPLICATION_JSON))
-                    .andExpect(jsonPath("$.code").value(ResponseStatus.DUPLICATE_NICKNAME_EXCEPTION.getCode()))
-                    .andExpect(jsonPath("$.message").value(ResponseStatus.DUPLICATE_NICKNAME_EXCEPTION.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("nickname"))
-                    .andExpect(jsonPath("$.data[0].message").value("이미 존재하는 닉네임입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("중복된 닉네임입니다."))
                     .andExpect(result ->
                             assertInstanceOf(DuplicateNickNameException.class, result.getResolvedException()))
                     .andDo(print());
@@ -292,8 +289,7 @@ class MemberControllerTest {
                             .content(request)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.code").value(400))
-                    .andExpect(jsonPath("$.message").value("잘못된 입력 값입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("nickname"))
                     .andExpect(jsonPath("$.data[0].message").value("닉네임을 입력해주세요."))
                     .andDo(print());

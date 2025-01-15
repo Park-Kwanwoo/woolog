@@ -3,6 +3,8 @@ package com.woolog.response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,22 +13,37 @@ import java.util.List;
 @Getter
 public class ApiResponse<T> {
 
-    private int code;
+    private static final String SUCCESS_STATUS = "SUCCESS";
+    private static final String FAIL_STATUS = "FAIL";
+    private static final String ERROR_STATUS = "ERROR";
+
+
+    private String statusCode;
     private String message;
-    private final List<T> data = new ArrayList<>();
+    private final T data;
 
-    public ApiResponse(ResponseStatus responseStatus) {
-        this.code = responseStatus.getCode();
-        this.message = responseStatus.getMessage();
-    }
-
-    @Builder
-    public ApiResponse(int code, String message) {
-        this.code = code;
+    public ApiResponse(String statusCode, String message, T data) {
+        this.statusCode = statusCode;
         this.message = message;
+        this.data = data;
     }
 
-    public void addData(T e) {
-        data.add(e);
+    public static <T> ApiResponse<T> successWithContent(T data) {
+        return new ApiResponse<>(SUCCESS_STATUS, null, data);
+    }
+
+    public static ApiResponse<?> errorWithBingResult(BindingResult bindingResult) {
+
+        List<ExceptionResponseData> errors = new ArrayList<>();
+
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            errors.add(new ExceptionResponseData(fieldError.getField(), fieldError.getDefaultMessage()));
+        }
+
+        return new ApiResponse<>(ERROR_STATUS, null, errors);
+    }
+
+    public static ApiResponse<?> error(String message) {
+        return new ApiResponse<>(ERROR_STATUS, message, null);
     }
 }

@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = extractRefreshToken(request.getCookies());
 
             if (!StringUtils.hasText(accessToken) || !StringUtils.hasText(refreshToken)) {
-                throw new InvalidTokenException("token", "token 값이 존재하지 않습니다.");
+                throw new InvalidTokenException();
             }
 
             try {
@@ -72,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String subject = access.getSubject();
                 Member member = memberRepository.findByEmail(subject)
-                        .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 회원입니다."));
+                        .orElseThrow(MemberNotExist::new);
                 String email = member.getEmail();
 
                 if (!email.equals(subject)) {

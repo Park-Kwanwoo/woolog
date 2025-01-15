@@ -178,14 +178,13 @@ class PostControllerTest {
             postRepository.saveAll(requestPosts);
 
             // when
-            mockMvc.perform(get("/posts?page=0&size=10")
+            mockMvc.perform(get("/posts?page=1&size=10")
                             .contentType(APPLICATION_JSON)
                     )
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()", is(10)))
-                    .andExpect(jsonPath("$[0].title").value("우로그 테스트 제목30"))
-                    .andExpect(jsonPath("$[0].content").value("우로그 테스트 내용30"))
-                    .andExpect(jsonPath("$[0].nickname").value("테스터박"))
+                    .andExpect(jsonPath("$.items.length()", is(10)))
+                    .andExpect(jsonPath("$.items[0].title").value("우로그 테스트 제목30"))
+                    .andExpect(jsonPath("$.items[0].content").value("우로그 테스트 내용30"))
+                    .andExpect(jsonPath("$.items[0].nickname").value("테스터박"))
                     .andDo(print());
 
             // then
@@ -206,7 +205,7 @@ class PostControllerTest {
                     .build();
 
             Member admin = memberRepository.findByEmail("admin@blog.com")
-                    .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                    .orElseThrow(MemberNotExist::new);
 
             post.setMember(admin);
             postRepository.save(post);
@@ -234,7 +233,7 @@ class PostControllerTest {
                     .andDo(print());
 
             Post editPost = postRepository.findById(post.getId())
-                    .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+                    .orElseThrow(PostNotFound::new);
 
             assertEquals("수정 후 제목", editPost.getTitle());
             assertEquals("수정 후 내용", editPost.getContent());
@@ -271,9 +270,9 @@ class PostControllerTest {
                     .andDo(print());
 
             PostNotFound ex = assertThrows(PostNotFound.class, () -> postRepository.findById(post.getId())
-                    .orElseThrow(() -> new PostNotFound("post", "존재하지 않는 글입니다.")));
+                    .orElseThrow(PostNotFound::new));
 
-            assertEquals("존재하지 않는 글입니다.", ex.getMessage());
+            assertEquals("존재하지 않는 게시글입니다.", ex.getMessage());
         }
 
     }
@@ -307,9 +306,7 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
                     .andExpect(jsonPath("$.data[0].message").value(TITLE_VALIDATION_MESSAGE))
                     .andDo(print());
@@ -340,9 +337,7 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(CONTENT_VALIDATION_MESSAGE))
                     .andDo(print());
@@ -374,9 +369,7 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.code").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(CONTENT_VALIDATION_MESSAGE))
                     .andExpect(jsonPath("$.data[1].field").value("title"))
@@ -391,11 +384,8 @@ class PostControllerTest {
             // expected
             mockMvc.perform(get("/posts/{postId}", 1L)
                             .contentType(APPLICATION_JSON))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("postId"))
-                    .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("존재하지 않는 게시글입니다."))
                     .andDo(print());
 
         }
@@ -425,11 +415,8 @@ class PostControllerTest {
                             .content(editJson)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("postId"))
-                    .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("존재하지 않는 게시글입니다."))
                     .andDo(print());
 
         }
@@ -468,9 +455,7 @@ class PostControllerTest {
                             .content(editJson)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("title"))
                     .andExpect(jsonPath("$.data[0].message").value(TITLE_VALIDATION_MESSAGE))
                     .andDo(print());
@@ -511,9 +496,7 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(CONTENT_VALIDATION_MESSAGE))
                     .andDo(print());
@@ -554,9 +537,7 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(BAD_REQUEST.getCode()))
-                    .andExpect(jsonPath("$.message").value(BAD_REQUEST.getMessage()))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("content"))
                     .andExpect(jsonPath("$.data[0].message").value(CONTENT_VALIDATION_MESSAGE))
                     .andExpect(jsonPath("$.data[1].field").value("title"))
@@ -585,11 +566,8 @@ class PostControllerTest {
                             .headers(headers)
                             .cookie(cookie)
                     )
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.code").value(NOT_FOUND.getCode()))
-                    .andExpect(jsonPath("$.message").value(NOT_FOUND.getMessage()))
-                    .andExpect(jsonPath("$.data[0].field").value("postId"))
-                    .andExpect(jsonPath("$.data[0].message").value("존재하지 않는 글입니다."))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.message").value("존재하지 않는 게시글입니다."))
                     .andDo(print());
 
         }

@@ -1,34 +1,15 @@
 package com.woolog.exception;
 
-import com.woolog.response.ExceptionResponseData;
-import com.woolog.response.ResponseStatus;
-import lombok.Getter;
-
-/**
- * status: 404
- */
-@Getter
 public class PostNotFound extends WoologException implements CustomException {
 
-    private final String field;
-    private final String message;
+    private static final String MESSAGE = "존재하지 않는 게시글입니다.";
 
-    public PostNotFound(String field, String message) {
-        super();
-        this.field = field;
-        this.message = message;
+    public PostNotFound() {
+        super(MESSAGE);
     }
 
     @Override
-    public ResponseStatus getHttpStatus() {
-        return ResponseStatus.NOT_FOUND;
-    }
-
-    @Override
-    public ExceptionResponseData getErrorResponse() {
-        return ExceptionResponseData.builder()
-                .field(this.field)
-                .message(this.message)
-                .build();
+    public String getMessage() {
+        return super.getMessage();
     }
 }
