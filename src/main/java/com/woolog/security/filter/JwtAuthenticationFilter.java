@@ -54,14 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (isExclude(request)) {
             filterChain.doFilter(request, response);
         } else {
-            String accessToken = request.getHeader("Authorization");
-            String refreshToken = extractRefreshToken(request.getCookies());
-
-            if (!StringUtils.hasText(accessToken) || !StringUtils.hasText(refreshToken)) {
-                throw new InvalidTokenException();
-            }
-
             try {
+                String accessToken = request.getHeader("Authorization");
+                String refreshToken = extractRefreshToken(request.getCookies());
+
+                if (!StringUtils.hasText(accessToken) || !StringUtils.hasText(refreshToken)) {
+                    throw new InvalidTokenException();
+                }
 
                 Claims access = jwtTokenGenerator.getPayload(accessToken);
                 Claims refresh = jwtTokenGenerator.getPayload(refreshToken);
@@ -84,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(email, null, Collections.singletonList(authority));
                 strategy.getContext().setAuthentication(authenticated);
 
-            } catch (JwtException | MemberInfoNotValidException | MemberAuthenticationException e) {
+            } catch (JwtException | MemberInfoNotValidException | InvalidTokenException e) {
                 SecurityContextHolder.clearContext();
                 request.setAttribute("exception", e);
             }
