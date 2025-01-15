@@ -36,10 +36,10 @@ public class CommentService {
 
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                .orElseThrow(MemberNotExist::new);
 
         Comment comment = commentCreate.toComment();
         comment.setMember(member);
@@ -69,7 +69,7 @@ public class CommentService {
 
             commentRepository.delete(comment);
         } catch (EntityNotFoundException e) {
-            throw new PostNotFound("post", e.getMessage());
+            throw new PostNotFound();
         } catch (DataIntegrityViolationException e) {
             throw new RuntimeException(e);
         }

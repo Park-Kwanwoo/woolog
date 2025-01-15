@@ -31,7 +31,7 @@ public class PostService {
     public void write(PostCreate postCreate, String email) {
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 이메일입니다."));
+                .orElseThrow(MemberNotExist::new);
 
         Post post = postCreate.toPost();
         post.setMember(member);
@@ -43,7 +43,7 @@ public class PostService {
     public PostResponse get(Long postId) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         return new PostResponse(post);
     }
@@ -60,7 +60,7 @@ public class PostService {
     public void edit(Long postId, PostEdit postEdit, String email) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         Member member = post.getMember();
 
@@ -82,7 +82,7 @@ public class PostService {
     public void delete(Long postId, String email) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFound("postId", "존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         Member member = post.getMember();
 

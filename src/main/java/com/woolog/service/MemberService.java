@@ -30,17 +30,17 @@ public class MemberService {
                 Member member = signup.toMember(passwordEncoder);
                 memberRepository.save(member);
             } else {
-                throw new DuplicateNickNameException("nickname", "이미 존재하는 닉네임입니다.");
+                throw new DuplicateNickNameException();
             }
         } else {
-            throw new DuplicateEmailException("email", "이미 존재하는 이메일입니다.");
+            throw new DuplicateEmailException();
         }
     }
 
     public MemberResponse getMember(String email) {
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 사용자입니다."));
+                .orElseThrow(MemberNotExist::new);
 
         return MemberResponse.of(member);
     }
@@ -49,7 +49,7 @@ public class MemberService {
     public void editMemberInfo(String email, MemberEdit memberEdit) {
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 사용자입니다."));
+                .orElseThrow(MemberNotExist::new);
 
         MemberEditor.MemberEditorBuilder editorBuilder = member.toEditor();
 
@@ -64,7 +64,7 @@ public class MemberService {
     public void deleteMember(String email) {
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotExist("member", "존재하지 않는 사용자입니다."));
+                .orElseThrow(MemberNotExist::new);
 
         memberRepository.delete(member);
     }
