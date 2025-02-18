@@ -1,4 +1,4 @@
-package com.woolog.request;
+package com.woolog.request.member;
 
 import lombok.Builder;
 import lombok.Getter;

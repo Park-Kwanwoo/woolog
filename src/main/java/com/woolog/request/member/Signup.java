@@ -1,4 +1,4 @@
-package com.woolog.request;
+package com.woolog.request.member;
 
 import com.woolog.domain.Member;
 import com.woolog.domain.Role;

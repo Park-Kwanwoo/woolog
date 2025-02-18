@@ -6,7 +6,7 @@ import com.woolog.domain.PostEditor;
 import com.woolog.exception.MemberInfoNotValidException;
 import com.woolog.exception.MemberNotExist;
 import com.woolog.exception.PostNotFound;
-import com.woolog.repository.MemberRepository;
+import com.woolog.repository.member.MemberRepository;
 import com.woolog.repository.post.PostRepository;
 import com.woolog.request.post.PagingRequest;
 import com.woolog.request.post.PostCreate;

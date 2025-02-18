@@ -1,13 +1,16 @@
 package com.woolog.service;
 
 import com.woolog.domain.Member;
-import com.woolog.domain.MemberEditor;
+import com.woolog.domain.NicknameEditor;
+import com.woolog.domain.PasswordEditor;
 import com.woolog.exception.DuplicateEmailException;
 import com.woolog.exception.DuplicateNickNameException;
+import com.woolog.exception.InvalidPassword;
 import com.woolog.exception.MemberNotExist;
-import com.woolog.repository.MemberRepository;
-import com.woolog.request.MemberEdit;
-import com.woolog.request.Signup;
+import com.woolog.repository.member.MemberRepository;
+import com.woolog.request.member.NicknameEdit;
+import com.woolog.request.member.PasswordEdit;
+import com.woolog.request.member.Signup;
 import com.woolog.response.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +28,8 @@ public class MemberService {
 
     public void singup(Signup signup) {
 
-        if (memberRepository.findByEmail(signup.getEmail()).isEmpty()) {
-            if (memberRepository.findByNickname(signup.getNickname()).isEmpty()) {
+        if (memberRepository.existsByEmail(signup.getEmail())) {
+            if (!memberRepository.existsByNickname(signup.getNickname())) {
                 Member member = signup.toMember(passwordEncoder);
                 memberRepository.save(member);
             } else {
@@ -46,19 +49,46 @@ public class MemberService {
     }
 
     @Transactional
-    public void editMemberInfo(String email, MemberEdit memberEdit) {
+    public MemberResponse editNickname(String email, NicknameEdit nicknameEdit) {
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(MemberNotExist::new);
 
-        MemberEditor.MemberEditorBuilder editorBuilder = member.toEditor();
+        if (memberRepository.existsByNickname(nicknameEdit.getNickname()) &&
+                !member.getNickname().equals(nicknameEdit.getNickname())) {
+            throw new DuplicateNickNameException();
+        }
 
-        MemberEditor memberEditor = editorBuilder
-                .nickname(memberEdit.getNickname())
-                .password(passwordEncoder.encode(memberEdit.getPassword()))
+        NicknameEditor.NicknameEditorBuilder editorBuilder = member.toNicknameEditor();
+
+        NicknameEditor nicknameEditor = editorBuilder
+                .nickname(nicknameEdit.getNickname())
                 .build();
 
-        member.edit(memberEditor);
+        member.editNickname(nicknameEditor);
+
+        return MemberResponse.of(member);
+    }
+
+    @Transactional
+    public MemberResponse editPassword(String email, PasswordEdit passwordEdit) {
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(MemberNotExist::new);
+
+        if (passwordEdit.getPassword() == null || passwordEdit.getPassword().isEmpty()) {
+            throw new InvalidPassword();
+        }
+
+        PasswordEditor.PasswordEditorBuilder editorBuilder = member.toPasswordEditor();
+
+        PasswordEditor passwordEditor = editorBuilder
+                .password(passwordEncoder.encode(passwordEdit.getPassword()))
+                .build();
+
+        member.editPassword(passwordEditor);
+
+        return MemberResponse.of(member);
     }
 
     public void deleteMember(String email) {

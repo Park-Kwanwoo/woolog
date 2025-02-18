@@ -2,7 +2,7 @@ package com.woolog.security.handler;
 
 import com.woolog.domain.Member;
 import com.woolog.exception.MemberAuthenticationException;
-import com.woolog.repository.MemberRepository;
+import com.woolog.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;

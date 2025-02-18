@@ -2,7 +2,7 @@ package com.woolog.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.exception.LoginArgumentValidation;
-import com.woolog.request.Login;
+import com.woolog.request.member.Login;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
