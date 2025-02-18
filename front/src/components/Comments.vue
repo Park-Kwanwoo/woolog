@@ -30,8 +30,8 @@ onMounted(() => {
   getComments()
 })
 
-function getComments() {
-  COMMENT_REPOSITORY.getList(props.postId)
+function getComments(page = 1) {
+  COMMENT_REPOSITORY.getList(props.postId, page)
     .then((commentList) => {
       state.commentList = commentList
     })
@@ -78,6 +78,16 @@ function remove(...args) {
       <CommentComponent :comment="comment" @remove="remove"/>
     </li>
   </ul>
+  <div class="d-flex justify-content-center">
+    <el-pagination
+      size="small"
+      :background="true"
+      v-model:current-page="state.commentList.page"
+      layout="prev, pager, next"
+      :default-page-size="7"
+      @current-change="(page) => getComments(page)"
+      :total="state.commentList.totalCount"/>
+  </div>
 </template>
 
 <style scoped lang="scss">
