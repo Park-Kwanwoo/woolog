@@ -49,6 +49,7 @@ export default class MemberRepository {
     })
       .then(() => {
         tokenStore.deleteToken()
+        ElMessage.success('로그아웃 되었습니다.')
         router.replace('/')
       })
   }
