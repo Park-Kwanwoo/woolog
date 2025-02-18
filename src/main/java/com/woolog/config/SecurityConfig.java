@@ -24,6 +24,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -56,11 +57,11 @@ public class SecurityConfig {
                 })
                 .addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> {
-                    logout.logoutUrl("/auth/logout")
-                            .permitAll();
-                    logout.logoutSuccessUrl("http://localhost:5173");
-                })
+                .logout(logout -> logout
+                        .logoutSuccessUrl("http://localhost:5173")
+                        .logoutUrl("/auth/logout")
+                        .deleteCookies("refreshToken")
+                        .permitAll())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/member").hasAuthority("MEMBER")
