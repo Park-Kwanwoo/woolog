@@ -52,15 +52,23 @@ public class Member extends BaseTimeEntity {
         this.role = role;
     }
 
-    public MemberEditor.MemberEditorBuilder toEditor() {
-        return MemberEditor.builder()
-                .nickname(this.nickname)
+    public NicknameEditor.NicknameEditorBuilder toNicknameEditor() {
+        return NicknameEditor.builder()
+                .nickname(this.nickname);
+
+    }
+
+    public PasswordEditor.PasswordEditorBuilder toPasswordEditor() {
+        return PasswordEditor.builder()
                 .password(this.password);
 
     }
 
-    public void edit(MemberEditor memberEditor) {
-        this.nickname = memberEditor.getNickname();
-        this.password = memberEditor.getPassword();
+    public void editNickname(NicknameEditor nicknameEditor) {
+        this.nickname = nicknameEditor.getNickname();
+    }
+
+    public void editPassword(PasswordEditor passwordEditor) {
+        this.password = passwordEditor.getPassword();
     }
 }
