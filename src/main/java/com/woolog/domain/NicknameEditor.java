@@ -4,14 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberEditor {
+public class NicknameEditor {
 
-    private final String password;
     private final String nickname;
 
     @Builder
-    public MemberEditor(String password, String nickname) {
-        this.password = password;
+    public NicknameEditor(String nickname) {
         this.nickname = nickname;
     }
 }
