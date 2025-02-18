@@ -3,7 +3,7 @@ import {computed, ref} from "vue";
 
 export const useTokenStore = defineStore('token', () => {
 
-    const token = ref<String | null>()
+    const token = ref<String | null>('')
     const isAuthenticated = computed((): boolean => !!token.value)
 
     function setToken(value: string) {
@@ -12,7 +12,7 @@ export const useTokenStore = defineStore('token', () => {
     }
 
     function deleteToken() {
-      token.value = null;
+      token.value = '';
       localStorage.removeItem('token')
     }
 
