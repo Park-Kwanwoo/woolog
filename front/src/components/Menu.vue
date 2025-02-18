@@ -18,20 +18,25 @@ const MEMBER_REPOSITORY = container.resolve(MemberRepository)
 watch(
   () => isAuthenticated.value,
   () => {
+    if (isAuthenticated.value) {
+      MEMBER_REPOSITORY.getProfile()
+        .then((memberProfile) => {
+          state.admin = memberProfile.admin
+          state.isMember = memberProfile.isMember;
+        })
+    }
+  }
+)
+
+onMounted(() => {
+
+  if (isAuthenticated.value) {
     MEMBER_REPOSITORY.getProfile()
       .then((memberProfile) => {
         state.admin = memberProfile.admin
         state.isMember = memberProfile.isMember;
       })
   }
-)
-
-onMounted(() => {
-  MEMBER_REPOSITORY.getProfile()
-    .then((memberProfile) => {
-      state.admin = memberProfile.admin
-      state.isMember = memberProfile.isMember;
-    })
 })
 
 function logout() {
