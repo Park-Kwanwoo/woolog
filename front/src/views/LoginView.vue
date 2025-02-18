@@ -4,7 +4,6 @@ import {reactive} from "vue";
 import Login from "@/entity/member/Login";
 import MemberRepository from "@/respository/MemberRepository";
 import {container} from "tsyringe";
-import {useTokenStore} from "@/stores/Token";
 
 const state = reactive({
   login: new Login()
