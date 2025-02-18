@@ -31,11 +31,8 @@ const state = reactive<StateType>({
 
 function getPost() {
   POST_REPOSITORY.get(props.postId)
-    .then((post: Post) => {
+    .then((post) => {
       state.post = post
-    })
-    .catch((e) => {
-      console.error(e)
     })
 }
 

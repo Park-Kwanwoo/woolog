@@ -4,7 +4,6 @@ import {reactive} from "vue";
 import PostWrite from "@/entity/post/PostWrite";
 import {container} from "tsyringe";
 import PostRepository from "@/respository/PostRepository";
-import {ElMessage} from "element-plus";
 
 const state = reactive({
   postWrite: new PostWrite()
