@@ -3,7 +3,7 @@ package com.woolog.security.filter;
 import com.woolog.config.JwtTokenGenerator;
 import com.woolog.domain.Member;
 import com.woolog.exception.*;
-import com.woolog.repository.MemberRepository;
+import com.woolog.repository.member.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -14,8 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -78,9 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new MemberInfoNotValidException();
                 }
 
-                String role = member.getRole().name();
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
-                UsernamePasswordAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(email, null, Collections.singletonList(authority));
+                UsernamePasswordAuthenticationToken authenticated = getAuthenticationToken(member);
                 strategy.getContext().setAuthentication(authenticated);
 
             } catch (JwtException | MemberInfoNotValidException | InvalidTokenException e) {
@@ -109,5 +105,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         return null;
+    }
+
+    private UsernamePasswordAuthenticationToken getAuthenticationToken(Member member) {
+        String role = member.getRole().name();
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
+
+        return UsernamePasswordAuthenticationToken.authenticated(member.getEmail(), null, Collections.singletonList(authority));
     }
 }
