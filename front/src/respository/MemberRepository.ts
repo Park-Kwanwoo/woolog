@@ -4,9 +4,11 @@ import {inject, singleton} from "tsyringe";
 import HttpRepository from "@/respository/HttpRepository";
 import type HttpError from "@/http/HttpError";
 import type Login from "@/entity/member/Login";
-import {useTokenStore} from "@/stores/Token";
+import {useTokenStore} from "@/stores/TokenStore";
 import {storeToRefs} from "pinia";
-import MemberProfile from "@/entity/member/MemberProfile";
+import MemberProfile from "@/entity/member/MemberProfile"
+import NicknameEdit from "@/request/NicknameEdit";
+import PasswordEdit from "@/request/PasswordEdit";
 
 @singleton()
 export default class MemberRepository {
@@ -25,7 +27,6 @@ export default class MemberRepository {
       .then((response) => {
 
         const statusCode = response.data.statusCode
-
         if (statusCode === 'ERROR') {
           ElMessage.error(response.data.message)
         } else {
@@ -46,9 +47,9 @@ export default class MemberRepository {
     return this.httpRepository.logout({
       path: '/api/auth/logout'
     })
-      .then((response) => {
-        localStorage.removeItem("token")
+      .then(() => {
         tokenStore.deleteToken()
+        router.replace('/')
       })
   }
 
@@ -57,12 +58,46 @@ export default class MemberRepository {
     const tokenStore = useTokenStore();
     const { token } = storeToRefs(tokenStore)
 
-    return this.httpRepository.get({
+    return this.httpRepository.get<MemberProfile>({
       path: '/api/members',
       headers: {
         Authorization: token.value
       }
     }, MemberProfile)
+      .then((response) => {
+        return response
+      })
+  }
+
+  public editNickname(request: NicknameEdit) {
+
+    const tokenStore = useTokenStore();
+    const { token } = storeToRefs(tokenStore)
+
+    return this.httpRepository.patch({
+      path: `/api/members/nickname`,
+      body: request,
+      headers: {
+        Authorization: token.value
+      }
+    })
+      .then((response) => {
+        return response
+      })
+  }
+
+  public editPassword(request: PasswordEdit) {
+
+    const tokenStore = useTokenStore();
+    const { token } = storeToRefs(tokenStore)
+
+    return this.httpRepository.patch({
+      path: `/api/members/password`,
+      body: request,
+      headers: {
+        Authorization: token.value
+      }
+    })
       .then((response) => {
         return response
       })

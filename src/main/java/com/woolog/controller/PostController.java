@@ -3,6 +3,7 @@ package com.woolog.controller;
 import com.woolog.request.post.PagingRequest;
 import com.woolog.request.post.PostCreate;
 import com.woolog.request.post.PostEdit;
+import com.woolog.response.ApiResponse;
 import com.woolog.response.PagingResponse;
 import com.woolog.response.PostResponse;
 import com.woolog.service.PostService;
@@ -25,13 +26,13 @@ public class PostController {
     }
 
     @GetMapping("/posts/{postId}")
-    public PostResponse get(@PathVariable Long postId) {
-        return postService.get(postId);
+    public ApiResponse<PostResponse> get(@PathVariable Long postId) {
+        return ApiResponse.successWithContent(postService.get(postId));
     }
 
     @GetMapping("/posts")
-    public PagingResponse<PostResponse> getList(@ModelAttribute @Valid PagingRequest pagingRequest) {
-        return postService.getPagingList(pagingRequest);
+    public ApiResponse<PagingResponse<PostResponse>> getList(@ModelAttribute @Valid PagingRequest pagingRequest) {
+        return ApiResponse.successWithContent(postService.getPagingList(pagingRequest));
     }
 
     @PatchMapping("/posts/{postId}")

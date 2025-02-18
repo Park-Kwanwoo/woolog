@@ -1,7 +1,8 @@
 package com.woolog.controller;
 
-import com.woolog.request.MemberEdit;
-import com.woolog.request.Signup;
+import com.woolog.request.member.NicknameEdit;
+import com.woolog.request.member.PasswordEdit;
+import com.woolog.request.member.Signup;
 import com.woolog.response.ApiResponse;
 import com.woolog.response.MemberResponse;
 import com.woolog.service.MemberService;
@@ -26,9 +27,14 @@ public class MemberController {
         return ApiResponse.successWithContent(memberService.getMember(email));
     }
 
-    @PatchMapping("/members")
-    public void editMemberInfo(@AuthenticationPrincipal String email, @RequestBody @Valid MemberEdit memberEdit) {
-        memberService.editMemberInfo(email, memberEdit);
+    @PatchMapping("/members/nickname")
+    public ApiResponse<MemberResponse> editNickname(@AuthenticationPrincipal String email, @RequestBody @Valid NicknameEdit nicknameEdit) {
+        return ApiResponse.successWithContent(memberService.editNickname(email, nicknameEdit));
+    }
+
+    @PatchMapping("/members/password")
+    public ApiResponse<MemberResponse> editPassword(@AuthenticationPrincipal String email, @RequestBody @Valid PasswordEdit passwordEdit) {
+        return ApiResponse.successWithContent(memberService.editPassword(email, passwordEdit));
     }
 
     @DeleteMapping("/members")

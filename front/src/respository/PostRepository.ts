@@ -1,7 +1,7 @@
 import {inject, singleton} from "tsyringe";
 import HttpRepository from "@/respository/HttpRepository";
 import type PostWrite from "@/entity/post/PostWrite";
-import {useTokenStore} from "@/stores/Token";
+import {useTokenStore} from "@/stores/TokenStore";
 import {storeToRefs} from "pinia";
 import {ElMessage} from "element-plus";
 import router from "@/router";

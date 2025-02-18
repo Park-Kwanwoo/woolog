@@ -4,6 +4,8 @@ import {inject, singleton} from "tsyringe";
 import {plainToInstance} from "class-transformer";
 import Null from "@/entity/data/Null";
 import Paging from "@/entity/data/Paging";
+import ApiResponse from "@/response/ApiResponse";
+import {ElMessage} from "element-plus";
 
 @singleton()
 export default class HttpRepository {
@@ -11,16 +13,28 @@ export default class HttpRepository {
   constructor(@inject(AxiosHttpClient) private readonly httpClient: AxiosHttpClient) {
   }
 
-  public get<T>(config: HttpRequestConfig, clazz: { new(...args: any[]) }): Promise<T> {
-    return this.httpClient.request({...config, method: 'GET'})
-      .then((response) => plainToInstance(clazz, response.data))
-  }
-
-  public getList<T>(config: HttpRequestConfig, clazz: { new(...args: any[]) }): Promise<Paging<T>> {
+  public get<T>(config: HttpRequestConfig, clazz: { new(...args: any[]) }): Promise<ApiResponse<T>> {
     return this.httpClient.request({...config, method: 'GET'})
       .then((response) => {
-        const paging = plainToInstance<Paging<T>, any>(Paging, response.data)
-        const items = plainToInstance<T, any>(clazz, response.data.items)
+
+        const apiResponse = plainToInstance<ApiResponse<T>, any>(ApiResponse, response.data)
+        const statusCode = apiResponse.statusCode
+        if (statusCode === 'ERROR') {
+          ElMessage.error('잘못된 접근입니다.')
+        } else {
+          return plainToInstance(clazz, apiResponse.data)
+        }
+      })
+
+  }
+
+  public getList<T>(config: HttpRequestConfig, clazz: { new(...args: any[]) }): Promise<ApiResponse<Paging<T>>> {
+    return this.httpClient.request({...config, method: 'GET'})
+      .then((response) => {
+
+        const apiResponse = plainToInstance<ApiResponse<Paging<T>, any>, any>(ApiResponse, response.data)
+        const paging = plainToInstance<Paging<T>, any>(Paging, apiResponse.data)
+        const items = plainToInstance<T, any>(clazz, paging.items)
         paging.setItems(items)
         return paging
       })
@@ -50,7 +64,7 @@ export default class HttpRepository {
 
   public logout(config: HttpRequestConfig) {
     return this.httpClient.request({...config, method: 'GET'})
-      .then((response) => {
+      .then(() => {
       })
   }
 }

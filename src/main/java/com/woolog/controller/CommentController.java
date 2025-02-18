@@ -2,6 +2,7 @@ package com.woolog.controller;
 
 import com.woolog.request.comment.CommentCreate;
 import com.woolog.request.post.PagingRequest;
+import com.woolog.response.ApiResponse;
 import com.woolog.response.CommentResponse;
 import com.woolog.response.PagingResponse;
 import com.woolog.service.CommentService;
@@ -22,8 +23,8 @@ public class CommentController {
     }
 
     @GetMapping("/posts/{postId}/comments")
-    public PagingResponse<CommentResponse> getList(@PathVariable("postId") Long postId, @ModelAttribute @Valid PagingRequest pagingRequest) {
-        return commentService.getList(pagingRequest, postId);
+    public ApiResponse<PagingResponse<CommentResponse>> getList(@PathVariable("postId") Long postId, @ModelAttribute @Valid PagingRequest pagingRequest) {
+        return ApiResponse.successWithContent(commentService.getList(pagingRequest, postId));
     }
 
     @DeleteMapping("/comments/{commentId}")
