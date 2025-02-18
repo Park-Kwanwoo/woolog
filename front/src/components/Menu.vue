@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import {useTokenStore} from "@/stores/Token";
+import {useTokenStore} from "@/stores/TokenStore";
 import {storeToRefs} from "pinia";
 import {container} from "tsyringe";
 import MemberRepository from "@/respository/MemberRepository";
 import {onMounted, reactive, watch} from "vue";
 
 const tokenStore = useTokenStore()
-const {isAuthenticated} = storeToRefs(tokenStore)
+const { isAuthenticated } = storeToRefs(tokenStore)
 
 const state = reactive({
-  isAdmin: false | null
+  admin: false | null,
+  isMember: false | null
 })
 
 const MEMBER_REPOSITORY = container.resolve(MemberRepository)
@@ -18,25 +19,26 @@ watch(
   () => isAuthenticated.value,
   () => {
     MEMBER_REPOSITORY.getProfile()
-      .then((response) => {
-        state.isAdmin = response.data.admin
+      .then((memberProfile) => {
+        state.admin = memberProfile.admin
+        state.isMember = memberProfile.isMember;
       })
   }
 )
 
 onMounted(() => {
   MEMBER_REPOSITORY.getProfile()
-    .then((response) => {
-      const statusCode = response.statusCode
-      if (statusCode !== 'ERROR')
-        state.isAdmin = response.data.admin
+    .then((memberProfile) => {
+      state.admin = memberProfile.admin
+      state.isMember = memberProfile.isMember;
     })
 })
 
 function logout() {
   MEMBER_REPOSITORY.logout()
     .then(() => {
-      state.isAdmin = false
+      state.admin = false
+      state.isMember = false
     });
 }
 </script>
@@ -47,15 +49,19 @@ function logout() {
       <router-link to="/">처음으로</router-link>
     </li>
 
-    <li class="menu" v-if="state.isAdmin">
+    <li class="menu" v-if="state.admin">
       <router-link to="/write">글 작성</router-link>
+    </li>
+
+    <li class="menu" v-if="state.isMember">
+      <router-link to="/mypage">마이페이지</router-link>
     </li>
 
     <li class="menu" v-if="!isAuthenticated">
       <router-link to="/login">로그인</router-link>
     </li>
     <li class="menu" v-else>
-      <a href="#" @click="logout()"> 로그아웃</a>
+      <a href="#" @click="logout()">로그아웃</a>
     </li>
   </ul>
 </template>

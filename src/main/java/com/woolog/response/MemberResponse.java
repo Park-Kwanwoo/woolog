@@ -5,20 +5,24 @@ import com.woolog.domain.Role;
 import lombok.Builder;
 import lombok.Getter;
 
+import static com.woolog.domain.Role.ADMIN;
+
 @Getter
 public class MemberResponse {
 
     private final String email;
     private final String name;
     private final String nickname;
-    private final boolean isAdmin;
+    private final Boolean admin;
+    private final Boolean isMember;
 
     @Builder
-    public MemberResponse(String email, String name, String nickname, boolean isAdmin) {
+    public MemberResponse(String email, String name, String nickname, boolean admin, boolean isMember) {
         this.email = email;
         this.name = name;
         this.nickname = nickname;
-        this.isAdmin = isAdmin;
+        this.admin = admin;
+        this.isMember = isMember;
     }
 
     public static MemberResponse of(Member member) {
@@ -26,7 +30,8 @@ public class MemberResponse {
                 .email(member.getEmail())
                 .name(member.getName())
                 .nickname(member.getNickname())
-                .isAdmin(member.getRole().equals(Role.ADMIN))
+                .admin(member.getRole().equals(ADMIN))
+                .isMember(true)
                 .build();
     }
 }
