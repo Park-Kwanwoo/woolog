@@ -4,7 +4,6 @@ import {container} from "tsyringe";
 import MemberRepository from "@/respository/MemberRepository";
 import {onMounted, reactive, ref} from "vue";
 import MemberInfo from "@/entity/member/MemberInfo";
-import router from "@/router";
 import {ElMessage} from "element-plus";
 import NicknameEdit from "@/request/NicknameEdit";
 import PasswordEdit from "@/request/PasswordEdit";
