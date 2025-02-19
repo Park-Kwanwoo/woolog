@@ -1,5 +1,7 @@
 package com.woolog.controller;
 
+import com.woolog.request.NicknameCheck;
+import com.woolog.request.member.EmailCheck;
 import com.woolog.request.member.NicknameEdit;
 import com.woolog.request.member.PasswordEdit;
 import com.woolog.request.member.Signup;
@@ -18,8 +20,19 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/members/signup")
-    public void signup(@RequestBody @Valid Signup signup) {
-        memberService.singup(signup);
+    public ApiResponse<?> signup(@RequestBody @Valid Signup signup) {
+        memberService.signup(signup);
+        return ApiResponse.successNoContent();
+    }
+
+    @PostMapping("/members/email")
+    public ApiResponse<Boolean> emailDuplicateCheck(@RequestBody @Valid EmailCheck emailCheck) {
+        return ApiResponse.successWithContent(memberService.emailDuplicateCheck(emailCheck));
+    }
+
+    @PostMapping("/members/nickname")
+    public ApiResponse<Boolean> nicknameDuplicateCheck(@RequestBody @Valid NicknameCheck nicknameCheck) {
+        return ApiResponse.successWithContent(memberService.nicknameDuplicateCheck(nicknameCheck));
     }
 
     @GetMapping("/members")
@@ -40,15 +53,5 @@ public class MemberController {
     @DeleteMapping("/members")
     public void deleteMember(@AuthenticationPrincipal String email) {
         memberService.deleteMember(email);
-    }
-
-    @GetMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
-
-    @GetMapping("/member")
-    public String member() {
-        return "member";
     }
 }

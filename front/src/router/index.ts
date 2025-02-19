@@ -5,6 +5,7 @@ import ReadView from "@/views/post/ReadView.vue";
 import EditView from "@/views/post/EditView.vue";
 import LoginView from "@/views/LoginView.vue";
 import MyPage from "@/views/member/MyPage.vue";
+import SignUp from "@/views/member/SignUp.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +42,11 @@ const router = createRouter({
       path: "/mypage",
       name: "mypage",
       component: MyPage
+    },
+    {
+      path: "/signup",
+      name: "signup",
+      component: SignUp
     }
   ],
 })

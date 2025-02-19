@@ -8,6 +8,8 @@ import com.woolog.exception.DuplicateNickNameException;
 import com.woolog.exception.InvalidPassword;
 import com.woolog.exception.MemberNotExist;
 import com.woolog.repository.member.MemberRepository;
+import com.woolog.request.member.NicknameCheck;
+import com.woolog.request.member.EmailCheck;
 import com.woolog.request.member.NicknameEdit;
 import com.woolog.request.member.PasswordEdit;
 import com.woolog.request.member.Signup;
@@ -26,9 +28,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void singup(Signup signup) {
+    public void signup(Signup signup) {
 
-        if (memberRepository.existsByEmail(signup.getEmail())) {
+        if (!memberRepository.existsByEmail(signup.getEmail())) {
             if (!memberRepository.existsByNickname(signup.getNickname())) {
                 Member member = signup.toMember(passwordEncoder);
                 memberRepository.save(member);
@@ -97,5 +99,13 @@ public class MemberService {
                 .orElseThrow(MemberNotExist::new);
 
         memberRepository.delete(member);
+    }
+
+    public boolean emailDuplicateCheck(EmailCheck emailCheck) {
+        return memberRepository.existsByEmail(emailCheck.getEmail());
+    }
+
+    public boolean nicknameDuplicateCheck(NicknameCheck nicknameCheck) {
+        return memberRepository.existsByNickname(nicknameCheck.getNickname());
     }
 }
