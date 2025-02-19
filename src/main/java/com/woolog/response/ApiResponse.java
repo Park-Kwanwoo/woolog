@@ -9,7 +9,6 @@ import org.springframework.validation.FieldError;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Getter
 public class ApiResponse<T> {
 
@@ -17,9 +16,8 @@ public class ApiResponse<T> {
     private static final String FAIL_STATUS = "FAIL";
     private static final String ERROR_STATUS = "ERROR";
 
-
-    private String statusCode;
-    private String message;
+    private final String statusCode;
+    private final String message;
     private final T data;
 
     public ApiResponse(String statusCode, String message, T data) {
@@ -30,6 +28,10 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> successWithContent(T data) {
         return new ApiResponse<>(SUCCESS_STATUS, null, data);
+    }
+
+    public static <T> ApiResponse <T> successNoContent() {
+        return new ApiResponse<>(SUCCESS_STATUS, null, null);
     }
 
     public static ApiResponse<?> errorWithBingResult(BindingResult bindingResult) {
