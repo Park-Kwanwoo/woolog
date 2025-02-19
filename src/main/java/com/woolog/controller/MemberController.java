@@ -1,6 +1,6 @@
 package com.woolog.controller;
 
-import com.woolog.request.NicknameCheck;
+import com.woolog.request.member.NicknameCheck;
 import com.woolog.request.member.EmailCheck;
 import com.woolog.request.member.NicknameEdit;
 import com.woolog.request.member.PasswordEdit;
