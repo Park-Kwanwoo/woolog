@@ -54,6 +54,10 @@ function logout() {
       <router-link to="/">처음으로</router-link>
     </li>
 
+    <li class="menu" v-if="!state.isMember">
+      <router-link to="/signup">회원가입</router-link>
+    </li>
+
     <li class="menu" v-if="state.admin">
       <router-link to="/write">글 작성</router-link>
     </li>
