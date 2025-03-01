@@ -1,18 +1,14 @@
 package com.woolog.annotation;
 
-import com.woolog.config.HashEncrypt;
 import com.woolog.domain.Member;
 import com.woolog.domain.Role;
-import com.woolog.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.woolog.repository.member.MemberRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
