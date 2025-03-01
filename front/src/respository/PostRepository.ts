@@ -50,6 +50,12 @@ export default class PostRepository {
     }, Post)
   }
 
+  public getSearchList(page: number, keyword: string) {
+    return this.httpRepository.getList<Post>({
+      path: `/api/posts?page=${page}&size=10&keyword=${keyword}`
+    }, Post)
+  }
+
   public edit(request: PostWrite, postId: number) {
 
     const tokenStore = useTokenStore();
