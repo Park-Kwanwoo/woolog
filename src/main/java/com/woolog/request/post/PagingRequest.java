@@ -20,9 +20,12 @@ public class PagingRequest {
     @Builder.Default
     private int size = 10;
 
-    public PagingRequest(int page, int size) {
+    private String keyword;
+
+    public PagingRequest(int page, int size, String keyword) {
         this.page = page;
         this.size = size;
+        this.keyword = keyword;
     }
 
     public long getOffset() {
