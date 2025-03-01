@@ -9,9 +9,11 @@ import type Post from "@/entity/post/Post";
 const POST_REPOSITORY = container.resolve(PostRepository)
 type StateType = {
   postList: Paging<Post>
+  keyword: string | null
 }
 const state = reactive<StateType>({
-  postList: new Paging<Post>()
+  postList: new Paging<Post>(),
+  keyword: ''
 })
 
 function getList(page = 1) {
@@ -25,11 +27,18 @@ onMounted(() => {
   getList()
 })
 
+function search(page = 1) {
+  POST_REPOSITORY.getSearchList(page, state.keyword)
+    .then((postList) => {
+      state.postList = postList;
+    })
+}
+
 </script>
 
 <template>
   <div class="d-flex justify-content-center">
-    <div class="content">
+    <div class="content w-50">
       <span class="totalCount">게시글 수: {{ state.postList.totalCount }}</span>
 
       <ul class="posts">
@@ -48,8 +57,15 @@ onMounted(() => {
           @current-change="(page) => getList(page)"
           :total="state.postList.totalCount"/>
       </div>
+
+      <div class="search-div">
+        <el-input type="text" v-model="state.keyword"/>
+        <el-button @click="search()" type="primary">검색</el-button>
+      </div>
     </div>
   </div>
+
+
 </template>
 
 <style scoped lang="scss">
@@ -72,6 +88,17 @@ onMounted(() => {
     &:last-child {
       margin-bottom: 0;
     }
+  }
+}
+
+.search-div {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 200px 0.2fr;
+  margin-top: 50px;
+
+  .el-button {
+    margin-left: 10px;
   }
 }
 </style>
