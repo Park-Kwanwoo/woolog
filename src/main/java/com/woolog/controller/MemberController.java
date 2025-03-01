@@ -20,7 +20,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/members/signup")
-    public ApiResponse<?> signup(@RequestBody @Valid Signup signup) {
+    public ApiResponse<Void> signup(@RequestBody @Valid Signup signup) {
         memberService.signup(signup);
         return ApiResponse.successNoContent();
     }
