@@ -8,10 +8,10 @@ import com.woolog.domain.Role;
 import com.woolog.exception.DuplicateEmailException;
 import com.woolog.exception.DuplicateNickNameException;
 import com.woolog.exception.MemberNotExist;
-import com.woolog.repository.MemberRepository;
-import com.woolog.request.MemberEdit;
-import com.woolog.request.Signup;
-import com.woolog.response.ResponseStatus;
+import com.woolog.repository.member.MemberRepository;
+import com.woolog.request.member.NicknameEdit;
+import com.woolog.request.member.PasswordEdit;
+import com.woolog.request.member.Signup;
 import com.woolog.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,6 +53,9 @@ class MemberControllerTest {
 
     @Autowired
     private JwtTokenGenerator jwtTokenGenerator;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @AfterEach
     void setUp() {
@@ -105,17 +109,17 @@ class MemberControllerTest {
                             .contentType(APPLICATION_JSON)
                             .headers(headers)
                             .cookie(cookie))
-                    .andExpect(jsonPath("$.email").value(member.getEmail()))
-                    .andExpect(jsonPath("$.name").value(member.getName()))
-                    .andExpect(jsonPath("$.nickname").value(member.getNickname()))
+                    .andExpect(jsonPath("$.data.email").value(member.getEmail()))
+                    .andExpect(jsonPath("$.data.name").value(member.getName()))
+                    .andExpect(jsonPath("$.data.nickname").value(member.getNickname()))
                     .andDo(print());
 
         }
 
         @Test
         @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
-        @DisplayName("회원정보 수정")
-        void EDIT_MEMBER_INFO() throws Exception {
+        @DisplayName("닉네임 수정")
+        void EDIT_MEMBER_NICKNAME() throws Exception {
 
             // given
             Member member = memberRepository.findByEmail("member@blog.com")
@@ -127,15 +131,14 @@ class MemberControllerTest {
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
 
-            MemberEdit memberEdit = MemberEdit.builder()
+            NicknameEdit nicknameEdit = NicknameEdit.builder()
                     .nickname("닉네임 변경")
-                    .password("qwer123$")
                     .build();
 
-            String editRequest = objectMapper.writeValueAsString(memberEdit);
+            String editRequest = objectMapper.writeValueAsString(nicknameEdit);
 
             // expected
-            mockMvc.perform(patch("/members")
+            mockMvc.perform(patch("/members/nickname")
                             .contentType(APPLICATION_JSON)
                             .content(editRequest)
                             .headers(headers)
@@ -146,6 +149,42 @@ class MemberControllerTest {
                     .orElseThrow(MemberNotExist::new);
 
             assertEquals("닉네임 변경", editMember.getNickname());
+
+        }
+
+        @Test
+        @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
+        @DisplayName("비밀번호 수정")
+        void EDIT_MEMBER_PASSWORD() throws Exception {
+
+            // given
+            Member member = memberRepository.findByEmail("member@blog.com")
+                    .orElseThrow(MemberNotExist::new);
+
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
+            PasswordEdit passwordEdit = PasswordEdit.builder()
+                    .password("1234")
+                    .build();
+
+            String editRequest = objectMapper.writeValueAsString(passwordEdit);
+
+            // expected
+            mockMvc.perform(patch("/members/password")
+                            .contentType(APPLICATION_JSON)
+                            .content(editRequest)
+                            .headers(headers)
+                            .cookie(cookie))
+                    .andDo(print());
+
+            Member editMember = memberRepository.findByEmail(member.getEmail())
+                    .orElseThrow(MemberNotExist::new);
+
+            assertTrue(passwordEncoder.matches(passwordEdit.getPassword(), editMember.getPassword()));
 
         }
 
@@ -269,11 +308,10 @@ class MemberControllerTest {
 
         @Test
         @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
-        @DisplayName("회원정보 수정 실패 - nickname null")
-        void FAIL_EDIT_MEMBER_INFO() throws Exception {
+        @DisplayName("닉네임 수정 실패")
+        void FAIL_EDIT_MEMBER_NICKNAME() throws Exception {
 
-            MemberEdit memberEdit = MemberEdit.builder()
-                    .password("qwer123$")
+            NicknameEdit nicknameEdit = NicknameEdit.builder()
                     .build();
 
             String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
@@ -282,9 +320,9 @@ class MemberControllerTest {
             headers.add("Authorization", accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
 
-            String request = objectMapper.writeValueAsString(memberEdit);
+            String request = objectMapper.writeValueAsString(nicknameEdit);
 
-            mockMvc.perform(patch("/members")
+            mockMvc.perform(patch("/members/nickname")
                             .contentType(APPLICATION_JSON)
                             .content(request)
                             .headers(headers)
@@ -292,6 +330,34 @@ class MemberControllerTest {
                     .andExpect(jsonPath("$.statusCode").value("ERROR"))
                     .andExpect(jsonPath("$.data[0].field").value("nickname"))
                     .andExpect(jsonPath("$.data[0].message").value("닉네임을 입력해주세요."))
+                    .andDo(print());
+
+        }
+
+        @Test
+        @CustomWithMockUser(email = "member@blog.com", role = "MEMBER")
+        @DisplayName("비밀번호 수정 실패")
+        void FAIL_EDIT_MEMBER_PASSWORD() throws Exception {
+
+            PasswordEdit passwordEdit = PasswordEdit.builder()
+                    .build();
+
+            String accessToken = jwtTokenGenerator.generateAccessToken("member@blog.com");
+            String refreshToken = jwtTokenGenerator.generateRefreshToken("member@blog.com");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+
+            String request = objectMapper.writeValueAsString(passwordEdit);
+
+            mockMvc.perform(patch("/members/password")
+                            .contentType(APPLICATION_JSON)
+                            .content(request)
+                            .headers(headers)
+                            .cookie(cookie))
+                    .andExpect(jsonPath("$.statusCode").value("ERROR"))
+                    .andExpect(jsonPath("$.data[0].field").value("password"))
+                    .andExpect(jsonPath("$.data[0].message").value("비밀번호를 입력해주세요."))
                     .andDo(print());
 
         }

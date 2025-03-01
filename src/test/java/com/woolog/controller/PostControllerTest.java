@@ -3,12 +3,13 @@ package com.woolog.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woolog.annotation.CustomWithMockUser;
 import com.woolog.config.JwtTokenGenerator;
+import com.woolog.domain.Comment;
 import com.woolog.domain.Member;
 import com.woolog.domain.Post;
 import com.woolog.domain.Role;
 import com.woolog.exception.MemberNotExist;
 import com.woolog.exception.PostNotFound;
-import com.woolog.repository.MemberRepository;
+import com.woolog.repository.member.MemberRepository;
 import com.woolog.repository.post.PostRepository;
 import com.woolog.request.post.PostCreate;
 import com.woolog.request.post.PostEdit;
@@ -30,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.woolog.response.ResponseStatus.BAD_REQUEST;
-import static com.woolog.response.ResponseStatus.NOT_FOUND;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -141,8 +140,8 @@ class PostControllerTest {
             ResultActions resultActions = mockMvc.perform(get("/posts/{postId}", savedPost.getId())
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.title").value("제목입니다."))
-                    .andExpect(jsonPath("$.content").value("내용"))
+                    .andExpect(jsonPath("$.data.title").value("제목입니다."))
+                    .andExpect(jsonPath("$.data.content").value("내용"))
                     .andDo(print());
 
             // then
@@ -181,15 +180,64 @@ class PostControllerTest {
             mockMvc.perform(get("/posts?page=1&size=10")
                             .contentType(APPLICATION_JSON)
                     )
-                    .andExpect(jsonPath("$.items.length()", is(10)))
-                    .andExpect(jsonPath("$.items[0].title").value("우로그 테스트 제목30"))
-                    .andExpect(jsonPath("$.items[0].content").value("우로그 테스트 내용30"))
-                    .andExpect(jsonPath("$.items[0].nickname").value("테스터박"))
+                    .andExpect(jsonPath("$.data.items.length()", is(10)))
+                    .andExpect(jsonPath("$.data.items[0].title").value("우로그 테스트 제목30"))
+                    .andExpect(jsonPath("$.data.items[0].content").value("우로그 테스트 내용30"))
+                    .andExpect(jsonPath("$.data.items[0].nickname").value("테스터박"))
                     .andDo(print());
 
             // then
             assertEquals(30, postRepository.count());
 
+        }
+
+        @Test
+        @DisplayName("게시글 검색 리스트 조회")
+        void GET_POST_LIST_TO_KEYWORD() throws Exception {
+
+            Member member = Member.builder()
+                    .email("admin@blog.com")
+                    .password("qwer123$")
+                    .name("관리자")
+                    .nickname("테스터박")
+                    .role(Role.ADMIN)
+                    .build();
+
+            memberRepository.save(member);
+
+            List<Post> requestPosts = IntStream.range(1, 31)
+                    .mapToObj(i -> Post.builder()
+                            .title("우로그 테스트 제목" + i)
+                            .content("우로그 테스트 내용" + i)
+                            .build()
+                    )
+                    .peek(post -> post.setMember(member))
+                    .toList();
+
+            Post searchTitle1 = Post.builder()
+                    .title("검색")
+                    .content("내용")
+                    .build();
+
+            Post searchTitle2 = Post.builder()
+                    .title("검색")
+                    .content("내용")
+                    .build();
+
+            searchTitle1.setMember(member);
+            searchTitle2.setMember(member);
+
+            postRepository.save(searchTitle1);
+            postRepository.save(searchTitle2);
+            postRepository.saveAll(requestPosts);
+
+            String keyword = "검색";
+
+            mockMvc.perform(get("/posts?page=1&size=10&keyword={keyword}", keyword)
+                            .contentType(APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.items.length()", is(2)))
+                    .andDo(print());
         }
 
         @Test
@@ -571,5 +619,30 @@ class PostControllerTest {
                     .andDo(print());
 
         }
+    }
+
+    @Test
+    @DisplayName("연관관계 테스트")
+    void test() {
+
+        Comment comment = Comment.builder()
+                .content("comment")
+                .build();
+
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        post.addComment(comment);
+
+        assertEquals(1, post.getComments().size());
+
+        Member member = Member.builder()
+                .nickname("nick")
+                .build();
+
+        post.setMember(member);
+        assertEquals(1, member.getPosts().size());
     }
 }
