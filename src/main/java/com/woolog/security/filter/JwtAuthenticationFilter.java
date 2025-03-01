@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     new AntPathRequestMatcher("/auth/logout", "GET"),
                     new AntPathRequestMatcher("/members/email", "POST"),
                     new AntPathRequestMatcher("/members/nickname", "POST"),
-                    new RegexRequestMatcher("^/posts(\\?page=\\d+(&size=\\d+)?)?$", "GET")
+                    new RegexRequestMatcher("^/posts(\\?page=\\d+(&size=\\d+)?(?:&keyword=[^&]+)?)?$", "GET")
             );
 
 
